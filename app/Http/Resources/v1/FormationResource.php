@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Http\Resources\v1;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class FormationResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            "id" => $this->id,
+            "name" => $this->name,
+            "slug" => $this->slug,
+            "description" => $this->description,
+            "image" => $this->image,
+            "level" => $this->level,
+            "duration" => $this->duration,
+            "price" => $this->price,
+            "capacity" => $this->capacity,
+            "enrolled_students" => $this->enrolled_students,
+            "teacher" => new UserResource($this->teacher),
+            "category" => new CategoryResource($this->category),
+            "course_type" => $this->course_type,
+            "end_date" => $this->end_date,
+            "start_date" => $this->start_date,
+            "link" => $this->link,
+            "certifications" => $this->whenLoaded('certifications', function () {
+                return $this->certifications->map(function ($certification) {
+                    return [
+                        'id' => $certification->id,
+                        'name' => $certification->name
+                    ];
+                });
+            }),
+            "created_at" => $this->created_at,
+            "updated_at" => $this->updated_at,
+        ];
+    }
+}
