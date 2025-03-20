@@ -23,6 +23,9 @@ return new class extends Migration
             $table->integer('validity_period')->unsigned(); // par année
             $table->enum('level', LevelEnum::values())->default(LevelEnum::BEGINNER->value);
             $table->json('benefits')->nullable();
+            $table->json('skills')->nullable();
+            $table->json('best_for')->nullable();
+            $table->json('prerequisites')->nullable();
             $table->string('link')->nullable();
             $table->timestamps();
         });

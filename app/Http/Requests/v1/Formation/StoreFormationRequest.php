@@ -37,6 +37,10 @@ class StoreFormationRequest extends FormRequest
             'course_type' => ['required', Rule::enum(CourseTypeEnum::class)],
             'end_date' => 'required|date',
             'start_date' => 'required|date',
+            'prerequisites' => 'nullable|array',
+            'prerequisites.*' => 'nullable|string',
+            'objectives' => 'nullable|array',
+            'objectives.*' => 'nullable|string',
         ];
     }
 }

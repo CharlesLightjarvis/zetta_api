@@ -14,12 +14,17 @@ class FormationService
 {
     public function getAllFormations()
     {
-        return FormationResource::collection(Formation::with('certifications')->get());
+        return FormationResource::collection(Formation::with('certifications', 'modules.lessons')->get());
     }
 
     public function getFormationById($id)
     {
-        return new FormationResource(Formation::with('certifications')->findOrFail($id));
+        return new FormationResource(Formation::with('certifications', 'modules.lessons')->findOrFail($id));
+    }
+
+    public function getFormationBySlug($slug)
+    {
+        return new FormationResource(Formation::with('certifications', 'modules.lessons')->where('slug', $slug)->firstOrFail());
     }
 
     public function createFormation($data)
@@ -27,7 +32,7 @@ class FormationService
         try {
             DB::beginTransaction();
             $slug = Str::slug($data['name']);
-            $formation  = Formation::where('slug', $slug)->exists();
+            $formation = Formation::where('slug', $slug)->exists();
             if ($formation) {
                 return false;
             }
@@ -44,6 +49,10 @@ class FormationService
             if (!$category) {
                 return false;
             }
+
+            // Traiter les prerequisites et objectives
+            $data['prerequisites'] = isset($data['prerequisites']) ? array_filter($data['prerequisites']) : null;
+            $data['objectives'] = isset($data['objectives']) ? array_filter($data['objectives']) : null;
 
             $formation = Formation::create($data);
 
@@ -93,6 +102,14 @@ class FormationService
                 if (!$category) {
                     return false;
                 }
+            }
+
+            // Traiter les prerequisites et objectives
+            if (isset($data['prerequisites'])) {
+                $data['prerequisites'] = array_filter($data['prerequisites']);
+            }
+            if (isset($data['objectives'])) {
+                $data['objectives'] = array_filter($data['objectives']);
             }
 
             $formation->update($data);

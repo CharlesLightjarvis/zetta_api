@@ -37,6 +37,10 @@ class UpdateFormationRequest extends FormRequest
             'course_type' => ['sometimes', 'required', Rule::enum(CourseTypeEnum::class)],
             'end_date' => 'sometimes|required|date',
             'start_date' => 'sometimes|required|date',
+            'prerequisites' => 'sometimes|nullable|array',
+            'prerequisites.*' => 'sometimes|nullable|string',
+            'objectives' => 'sometimes|nullable|array',
+            'objectives.*' => 'sometimes|nullable|string',
         ];
     }
 }

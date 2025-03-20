@@ -73,4 +73,10 @@ class FormationController extends Controller
         }
         return $this->errorResponse('Formation not found', 404);
     }
+
+    public function getFormationBySlug($slug)
+    {
+        $formation = $this->formationService->getFormationBySlug($slug);
+        return $this->successResponse('Formation retrieved successfully', 'formation', $formation);
+    }
 }

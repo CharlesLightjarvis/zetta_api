@@ -24,6 +24,8 @@ class Formation extends Model
         'course_type',
         'end_date',
         'start_date',
+        'prerequisites',
+        'objectives',
     ];
 
     public function getLinkAttribute()
@@ -51,9 +53,10 @@ class Formation extends Model
         return $this->hasMany(Certification::class);
     }
 
-    public function prerequisites()
+
+    public function modules()
     {
-        return $this->hasMany(Prerequisite::class);
+        return $this->hasMany(Module::class);
     }
 
     protected function casts(): array
@@ -61,6 +64,8 @@ class Formation extends Model
         return [
             'end_date' => 'date',
             'start_date' => 'date',
+            'prerequisites' => 'array',
+            'objectives' => 'array',
         ];
     }
 }

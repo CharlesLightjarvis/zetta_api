@@ -16,6 +16,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('fullName', 100);
             $table->string('password');
+            $table->text('bio')->nullable();
+            $table->text('title')->nullable();
             $table->string('email', 100)->unique();
             $table->string('imageUrl')->nullable();
             $table->timestamp('email_verified_at')->nullable();

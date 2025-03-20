@@ -5,24 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
-class Prerequisite extends Model
+class Module extends Model
 {
     use HasUuids;
 
     protected $fillable = [
         'formation_id',
-        'certification_id',
+        'name',
+        'slug',
         'description',
-        'order',
     ];
 
     public function formation()
     {
-        return $this->belongsTo(Formation::class)->withDefault();
+        return $this->belongsTo(Formation::class);
     }
 
-    public function certification()
+    public function lessons()
     {
-        return $this->belongsTo(Certification::class)->withDefault();
+        return $this->hasMany(Lesson::class);
     }
 }

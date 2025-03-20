@@ -31,11 +31,28 @@ class FormationResource extends JsonResource
             "start_date" => $this->start_date->format('Y-m-d'),
             "end_date" => $this->end_date->format('Y-m-d'),
             "link" => $this->link,
+            "prerequisites" => $this->prerequisites,
+            "objectives" => $this->objectives,
             "certifications" => $this->whenLoaded('certifications', function () {
                 return $this->certifications->map(function ($certification) {
                     return [
                         'id' => $certification->id,
                         'name' => $certification->name
+                    ];
+                });
+            }),
+            "modules" => $this->whenLoaded('modules', function () {
+                return $this->modules->map(function ($module) {
+                    return [
+                        'id' => $module->id,
+                        'name' => $module->name,
+                        'description' => $module->description,
+                        'lessons' => $module->lessons->map(function ($lesson) {
+                            return [
+                                'id' => $lesson->id,
+                                'name' => $lesson->name
+                            ];
+                        })
                     ];
                 });
             }),

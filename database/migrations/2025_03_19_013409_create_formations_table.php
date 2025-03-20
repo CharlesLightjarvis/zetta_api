@@ -29,6 +29,8 @@ return new class extends Migration
             $table->enum('course_type', CourseTypeEnum::values())->default(CourseTypeEnum::DAY->value);
             $table->date('end_date');
             $table->date('start_date');
+            $table->json('prerequisites')->nullable();
+            $table->json('objectives')->nullable();
             $table->timestamps();
         });
     }

@@ -19,17 +19,15 @@ class Certification extends Model
         'level',
         'slug',
         'benefits',
+        'skills',
+        'best_for',
+        'prerequisites',
         'link',
     ];
 
     public function formation()
     {
         return $this->belongsTo(Formation::class);
-    }
-
-    public function prerequisites()
-    {
-        return $this->hasMany(Prerequisite::class);
     }
 
     public function students()
@@ -41,6 +39,9 @@ class Certification extends Model
     {
         return [
             'benefits' => 'array',
+            'skills' => 'array',
+            'best_for' => 'array',
+            'prerequisites' => 'array',
         ];
     }
 }
