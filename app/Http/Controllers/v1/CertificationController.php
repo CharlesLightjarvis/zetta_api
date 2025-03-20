@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdateCertificationRequest;
+use App\Http\Requests\v1\Certification\UpdateCertificationRequest;
 use App\Http\Requests\v1\Certification\StoreCertificationRequest;
 use App\Http\Services\V1\CertificationService;
-use App\Models\Certification;
 use App\Trait\ApiResponse;
 
 class CertificationController extends Controller
@@ -44,24 +43,33 @@ class CertificationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Certification $certification)
+    public function show($id)
     {
-        //
+        $certification = $this->certificationService->getCertificationById($id);
+        return $this->successResponse('Certification retrieved successfully', 'certification', $certification);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCertificationRequest $request, Certification $certification)
+    public function update(UpdateCertificationRequest $request,  $id)
     {
-        //
+        $is_updated = $this->certificationService->updateCertification($id, $request->validated());
+        if ($is_updated) {
+            return $this->successNoData('Certification updated successfully');
+        }
+        return $this->errorResponse('Certification not found or cannot be updated', 400);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Certification $certification)
+    public function destroy($id)
     {
-        //
+        $is_deleted = $this->certificationService->deleteCertification($id);
+        if ($is_deleted) {
+            return $this->successNoData('Certification deleted successfully');
+        }
+        return $this->errorResponse('Certification not found', 404);
     }
 }

@@ -59,14 +59,44 @@ class CertificationService
 
     public function updateCertification($id, $data)
     {
-        $certification = Certification::find($id);
-        if (!$certification) return false;
+        try {
+            DB::beginTransaction();
 
-        if (isset($data['name']) && !isset($data['slug'])) {
-            $data['slug'] = Str::slug($data['name']);
+            $certification = Certification::find($id);
+            if (!$certification) {
+                return false;
+            }
+
+            // Si le nom est modifié, vérifier que le nouveau slug n'existe pas déjà
+            if (isset($data['name'])) {
+                $newSlug = Str::slug($data['name']);
+                if ($newSlug !== $certification->slug) {
+                    $slugExists = Certification::where('slug', $newSlug)
+                        ->where('id', '!=', $id)
+                        ->exists();
+                    if ($slugExists) {
+                        return false;
+                    }
+                    $data['slug'] = $newSlug;
+                }
+            }
+
+            // Vérifier la formation si l'ID est modifié
+            if (isset($data['formation_id'])) {
+                $formation = Formation::find($data['formation_id']);
+                if (!$formation) {
+                    return false;
+                }
+            }
+
+            $certification->update($data);
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            return false;
         }
-
-        return $certification->update($data);
     }
 
     public function deleteCertification($id)

@@ -28,8 +28,8 @@ class FormationResource extends JsonResource
             "teacher" => new UserResource($this->teacher),
             "category" => new CategoryResource($this->category),
             "course_type" => $this->course_type,
-            "end_date" => $this->end_date,
-            "start_date" => $this->start_date,
+            "start_date" => $this->start_date->format('Y-m-d'),
+            "end_date" => $this->end_date->format('Y-m-d'),
             "link" => $this->link,
             "certifications" => $this->whenLoaded('certifications', function () {
                 return $this->certifications->map(function ($certification) {
@@ -39,8 +39,8 @@ class FormationResource extends JsonResource
                     ];
                 });
             }),
-            "created_at" => $this->created_at,
-            "updated_at" => $this->updated_at,
+            "created_at" => $this->created_at->format('Y-m-d H:i'),
+            "updated_at" => $this->updated_at->format('Y-m-d H:i'),
         ];
     }
 }

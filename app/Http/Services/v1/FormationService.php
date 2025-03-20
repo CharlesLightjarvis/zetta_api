@@ -57,14 +57,52 @@ class FormationService
 
     public function updateFormation($id, $data)
     {
-        $formation = Formation::find($id);
-        if (!$formation) return false;
+        try {
+            DB::beginTransaction();
 
-        if (isset($data['name']) && !isset($data['slug'])) {
-            $data['slug'] = Str::slug($data['name']);
+            $formation = Formation::find($id);
+            if (!$formation) {
+                return false;
+            }
+
+            // Si le nom est modifié, vérifier que le nouveau slug n'existe pas déjà
+            if (isset($data['name'])) {
+                $newSlug = Str::slug($data['name']);
+                if ($newSlug !== $formation->slug) {
+                    $slugExists = Formation::where('slug', $newSlug)
+                        ->where('id', '!=', $id)
+                        ->exists();
+                    if ($slugExists) {
+                        return false;
+                    }
+                    $data['slug'] = $newSlug;
+                }
+            }
+
+            // Vérifier l'enseignant si l'ID est modifié
+            if (isset($data['teacher_id'])) {
+                $user = User::find($data['teacher_id']);
+                if (!$user || !$user->hasRole('teacher')) {
+                    return false;
+                }
+            }
+
+            // Vérifier la catégorie si l'ID est modifié
+            if (isset($data['category_id'])) {
+                $category = Category::find($data['category_id']);
+                if (!$category) {
+                    return false;
+                }
+            }
+
+            $formation->update($data);
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            return false;
         }
-
-        return $formation->update($data);
     }
 
     public function deleteFormation($id)

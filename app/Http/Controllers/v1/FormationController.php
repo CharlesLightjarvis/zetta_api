@@ -44,24 +44,33 @@ class FormationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Formation $formation)
+    public function show($id)
     {
-        //
+        $formation = $this->formationService->getFormationById($id);
+        return $this->successResponse('Formation retrieved successfully', 'formation', $formation);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateFormationRequest $request, Formation $formation)
+    public function update(UpdateFormationRequest $request, $id)
     {
-        //
+        $is_updated = $this->formationService->updateFormation($id, $request->validated());
+        if ($is_updated) {
+            return $this->successNoData('Formation updated successfully');
+        }
+        return $this->errorResponse('Formation not found or cannot be updated', 400);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Formation $formation)
+    public function destroy($id)
     {
-        //
+        $is_deleted = $this->formationService->deleteFormation($id);
+        if ($is_deleted) {
+            return $this->successNoData('Formation deleted successfully');
+        }
+        return $this->errorResponse('Formation not found', 404);
     }
 }
