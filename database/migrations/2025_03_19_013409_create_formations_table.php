@@ -22,13 +22,7 @@ return new class extends Migration
             $table->enum('level', LevelEnum::values())->default(LevelEnum::BEGINNER->value);
             $table->integer('duration')->unsigned(); // en semaine
             $table->integer('price');
-            $table->integer('capacity')->unsigned();
-            $table->integer('enrolled_students')->unsigned()->default(0); // Étudiants actuellement inscrits
-            $table->foreignUuid('teacher_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignUuid('category_id')->constrained('categories')->restrictOnDelete();
-            $table->enum('course_type', CourseTypeEnum::values())->default(CourseTypeEnum::DAY->value);
-            $table->date('end_date');
-            $table->date('start_date');
             $table->json('prerequisites')->nullable();
             $table->json('objectives')->nullable();
             $table->timestamps();

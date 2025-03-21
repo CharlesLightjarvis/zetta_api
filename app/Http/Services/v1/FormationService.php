@@ -5,7 +5,6 @@ namespace App\Http\Services\V1;
 use App\Http\Resources\v1\FormationResource;
 use App\Models\Category;
 use App\Models\Formation;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -14,17 +13,17 @@ class FormationService
 {
     public function getAllFormations()
     {
-        return FormationResource::collection(Formation::with('certifications', 'modules.lessons')->get());
+        return FormationResource::collection(Formation::with('certifications', 'modules.lessons', 'sessions.teacher')->get());
     }
 
     public function getFormationById($id)
     {
-        return new FormationResource(Formation::with('certifications', 'modules.lessons')->findOrFail($id));
+        return new FormationResource(Formation::with('certifications', 'modules.lessons', 'sessions.teacher')->findOrFail($id));
     }
 
     public function getFormationBySlug($slug)
     {
-        return new FormationResource(Formation::with('certifications', 'modules.lessons')->where('slug', $slug)->firstOrFail());
+        return new FormationResource(Formation::with('certifications', 'modules.lessons', 'sessions.teacher')->where('slug', $slug)->firstOrFail());
     }
 
     public function createFormation($data)
@@ -37,12 +36,6 @@ class FormationService
                 return false;
             }
             $data['slug'] = $slug;
-
-            // Vérifier si l'enseignant existe et a le rôle 'teacher'
-            $user = User::find($data['teacher_id']);
-            if (!$user || !$user->hasRole('teacher')) {
-                return false;
-            }
 
             $category = Category::find($data['category_id']);
             // Vérifier si la catégorie existe
@@ -85,14 +78,6 @@ class FormationService
                         return false;
                     }
                     $data['slug'] = $newSlug;
-                }
-            }
-
-            // Vérifier l'enseignant si l'ID est modifié
-            if (isset($data['teacher_id'])) {
-                $user = User::find($data['teacher_id']);
-                if (!$user || !$user->hasRole('teacher')) {
-                    return false;
                 }
             }
 

@@ -30,6 +30,7 @@ class UpdateUserRequest extends FormRequest
                 Rule::unique('users')->ignore($this->route('user')), // Ignorer l'email actuel
             ],
             'role' => 'sometimes|string|exists:roles,name',
+            'phone' => 'sometimes|string|max:255',
         ];
     }
 }

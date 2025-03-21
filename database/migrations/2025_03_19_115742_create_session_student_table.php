@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('formation_student', function (Blueprint $table) {
-            $table->uuid('formation_id')->constrained('formations')->cascadeOnDelete();
+        Schema::create('session_student', function (Blueprint $table) {
+            $table->uuid('session_id')->constrained('sessions')->cascadeOnDelete();
             $table->uuid('student_id')->constrained('users')->cascadeOnDelete();
 
-            $table->primary(['formation_id', 'student_id']);
+            $table->primary(['session_id', 'student_id']);
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('formation_student');
+        Schema::dropIfExists('session_student');
     }
 };

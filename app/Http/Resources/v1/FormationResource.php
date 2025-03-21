@@ -23,13 +23,7 @@ class FormationResource extends JsonResource
             "level" => $this->level,
             "duration" => $this->duration,
             "price" => $this->price,
-            "capacity" => $this->capacity,
-            "enrolled_students" => $this->enrolled_students,
-            "teacher" => new UserResource($this->teacher),
             "category" => new CategoryResource($this->category),
-            "course_type" => $this->course_type,
-            "start_date" => $this->start_date->format('Y-m-d'),
-            "end_date" => $this->end_date->format('Y-m-d'),
             "link" => $this->link,
             "prerequisites" => $this->prerequisites,
             "objectives" => $this->objectives,
@@ -55,6 +49,24 @@ class FormationResource extends JsonResource
                         })
                     ];
                 });
+            }),
+            "sessions" => $this->whenLoaded('sessions', function () {
+                return $this->sessions
+                    ->sortByDesc(function ($session) {
+                        return $session->start_date->diffInSeconds(now());
+                    })
+                    ->values() // Ceci va réindexer le tableau séquentiellement
+                    ->map(function ($session) {
+                        return [
+                            'id' => $session->id,
+                            'course_type' => $session->course_type,
+                            'start_date' => $session->start_date->format('Y-m-d'),
+                            'end_date' => $session->end_date->format('Y-m-d'),
+                            'capacity' => $session->capacity,
+                            'enrolled_students' => $session->enrolled_students,
+                            'teacher' => $session->teacher ? new UserResource($session->teacher) : null
+                        ];
+                    });
             }),
             "created_at" => $this->created_at->format('Y-m-d H:i'),
             "updated_at" => $this->updated_at->format('Y-m-d H:i'),

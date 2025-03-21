@@ -15,10 +15,11 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('fullName', 100);
+            $table->string('email', 100)->unique();
             $table->string('password');
+            $table->string('phone')->nullable();
             $table->text('bio')->nullable();
             $table->text('title')->nullable();
-            $table->string('email', 100)->unique();
             $table->string('imageUrl')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->enum('status', UserStatusEnum::values())->default(UserStatusEnum::ACTIVE->value);

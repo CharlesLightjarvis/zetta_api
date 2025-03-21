@@ -20,8 +20,13 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RoleAndPermissionSeeder::class,
-            UserSeeder::class,
-            CategorySeeder::class,
+            UserSeeder::class,        // 1. Crée les utilisateurs (admin, teachers, students)
+            CategorySeeder::class,    // 2. Crée les catégories
+            FormationSeeder::class,   // 3. Crée les formations
+            CertificationSeeder::class, // 4. Crée les certifications
+            ModuleSeeder::class,      // 5. Crée les modules
+            LessonSeeder::class,      // 6. Crée les leçons
+            FormationSessionSeeder::class, // 7. Crée les sessions de formation
         ]);
     }
 }

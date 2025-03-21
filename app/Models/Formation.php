@@ -17,13 +17,7 @@ class Formation extends Model
         'level',
         'duration',
         'price',
-        'capacity',
-        'enrolled_students',
-        'teacher_id',
         'category_id',
-        'course_type',
-        'end_date',
-        'start_date',
         'prerequisites',
         'objectives',
     ];
@@ -38,11 +32,6 @@ class Formation extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function teacher()
-    {
-        return $this->belongsTo(User::class, 'teacher_id');
-    }
-
     public function students()
     {
         return $this->belongsToMany(User::class, 'formation_student', 'formation_id', 'student_id');
@@ -53,17 +42,24 @@ class Formation extends Model
         return $this->hasMany(Certification::class);
     }
 
-
     public function modules()
     {
         return $this->hasMany(Module::class);
     }
 
+    public function sessions()
+    {
+        return $this->hasMany(FormationSession::class);
+    }
+
+    public function interests()
+    {
+        return $this->hasMany(FormationInterest::class);
+    }
+
     protected function casts(): array
     {
         return [
-            'end_date' => 'date',
-            'start_date' => 'date',
             'prerequisites' => 'array',
             'objectives' => 'array',
         ];

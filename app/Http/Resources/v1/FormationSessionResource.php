@@ -5,7 +5,7 @@ namespace App\Http\Resources\v1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CertificationResource extends JsonResource
+class FormationSessionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,24 +16,20 @@ class CertificationResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "name" => $this->name,
-            "slug" => $this->slug,
-            "description" => $this->description,
-            "image" => $this->image,
-            "provider" => $this->provider,
-            "validity_period" => $this->validity_period,
-            "level" => $this->level,
-            "benefits" => $this->benefits,
-            "link" => $this->link,
+            "course_type" => $this->course_type,
+            "start_date" => $this->start_date->format('Y-m-d'),
+            "end_date" => $this->end_date->format('Y-m-d'),
+            "capacity" => $this->capacity,
+            "enrolled_students" => $this->enrolled_students,
             "formation" => $this->whenLoaded('formation', function () {
                 return [
                     'id' => $this->formation->id,
                     'name' => $this->formation->name
                 ];
             }),
-            "prerequisites" => $this->prerequisites,
-            "skills" => $this->skills,
-            "best_for" => $this->best_for,
+            "teacher" => $this->whenLoaded('teacher', function () {
+                return new UserResource($this->teacher);
+            }),
             "created_at" => $this->created_at->format('Y-m-d H:i'),
             "updated_at" => $this->updated_at->format('Y-m-d H:i'),
         ];
