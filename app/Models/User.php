@@ -44,18 +44,24 @@ class User extends Authenticatable
         return $date->format('Y-m-d H:i');
     }
 
-    public function formationsAsTeacher()
+    /**
+     * Sessions où l'utilisateur est enseignant
+     */
+    public function teachingSessions()
     {
-        return $this->hasMany(Formation::class, 'teacher_id');
+        return $this->hasMany(FormationSession::class, 'teacher_id');
+    }
+
+    /**
+     * Sessions où l'utilisateur est étudiant
+     */
+    public function enrolledSessions()
+    {
+        return $this->belongsToMany(FormationSession::class, 'session_student', 'student_id', 'session_id');
     }
 
     public function certifications()
     {
         return $this->belongsToMany(Certification::class, 'certification_student', 'student_id', 'certification_id');
-    }
-
-    public function formationsAsStudent()
-    {
-        return $this->belongsToMany(Formation::class, 'formation_student', 'student_id', 'formation_id');
     }
 }

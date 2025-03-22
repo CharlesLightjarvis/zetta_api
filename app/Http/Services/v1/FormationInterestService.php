@@ -26,9 +26,11 @@ class FormationInterestService
 
             // Load the formation relationship
             $interest->load('formation');
+            Log::info('Formation loaded');
 
             // Broadcast the event
             broadcast(new NewFormationInterest($interest))->toOthers();
+            Log::info('Event broadcasted');
 
             // DB::commit();
             return true;
