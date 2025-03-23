@@ -49,13 +49,15 @@ jobs:
 
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse
+
       - name: Deploy using ssh
         uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          # password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd ${{ secrets.APP_PATH }}
-            ./build.sh
+            cd /var/www/zetta_api   # Assure-toi d'être dans le bon dossier
+            ls -l                    # Vérifie que build.sh est bien là
+            chmod +x build.sh        # S'il n'est pas exécutable, le rendre exécutable
+            ./build.sh               # Exécution du script
