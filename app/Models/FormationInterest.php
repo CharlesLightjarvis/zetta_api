@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FormationInterest extends Model
 {
@@ -18,7 +19,7 @@ class FormationInterest extends Model
         'status'
     ];
 
-    public function formation()
+    public function formation(): BelongsTo
     {
         return $this->belongsTo(Formation::class);
     }

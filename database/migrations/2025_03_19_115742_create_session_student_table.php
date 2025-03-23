@@ -16,6 +16,7 @@ return new class extends Migration
             $table->uuid('student_id')->constrained('users')->cascadeOnDelete();
 
             $table->primary(['session_id', 'student_id']);
+            $table->unique(['session_id', 'student_id']);
             $table->timestamps();
         });
     }

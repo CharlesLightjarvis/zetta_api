@@ -4,6 +4,7 @@ namespace App\Http\Services\V1;
 
 use App\Http\Resources\v1\CategoryResource;
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CategoryService
@@ -20,13 +21,21 @@ class CategoryService
 
     public function createCategory($data)
     {
-        $slug = Str::slug($data['name']);
-        $category  = Category::where('slug', $slug)->exists();
-        if ($category) {
+        try {
+            DB::beginTransaction();
+            $slug = Str::slug($data['name']);
+            $category  = Category::where('slug', $slug)->exists();
+            if ($category) {
+                return false;
+            }
+            $data['slug'] = $slug;
+            Category::create($data);
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollback();
             return false;
         }
-        $data['slug'] = $slug;
-        return Category::create($data) ? true : false;
     }
 
     public function updateCategory($id, $data)

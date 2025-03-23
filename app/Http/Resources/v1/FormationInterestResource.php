@@ -5,6 +5,17 @@ namespace App\Http\Resources\v1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property int $id
+ * @property string $fullName
+ * @property string $email
+ * @property string|null $phone
+ * @property string|null $message
+ * @property string $status
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ * @property-read \App\Models\Formation|null $formation
+ */
 class FormationInterestResource extends JsonResource
 {
     /**
@@ -18,8 +29,8 @@ class FormationInterestResource extends JsonResource
             "id" => $this->id,
             "formation" => $this->whenLoaded('formation', function () {
                 return [
-                    'id' => $this->formation->id,
-                    'name' => $this->formation->name
+                    'id' => $this->formation?->id,
+                    'name' => $this->formation?->name
                 ];
             }),
             "fullName" => $this->fullName,

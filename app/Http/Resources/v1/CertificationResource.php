@@ -5,6 +5,24 @@ namespace App\Http\Resources\v1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property string|null $description
+ * @property string|null $image
+ * @property string|null $provider
+ * @property string|null $validity_period
+ * @property string|null $level
+ * @property string|null $benefits
+ * @property string|null $link
+ * @property string|null $prerequisites
+ * @property string|null $skills
+ * @property string|null $best_for
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ * @property-read \App\Models\Formation|null $formation
+ */
 class CertificationResource extends JsonResource
 {
     /**
@@ -27,8 +45,8 @@ class CertificationResource extends JsonResource
             "link" => $this->link,
             "formation" => $this->whenLoaded('formation', function () {
                 return [
-                    'id' => $this->formation->id,
-                    'name' => $this->formation->name
+                    'id' => $this->formation?->id,
+                    'name' => $this->formation?->name
                 ];
             }),
             "prerequisites" => $this->prerequisites,

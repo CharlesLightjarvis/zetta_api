@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Certification extends Model
 {
@@ -25,12 +27,12 @@ class Certification extends Model
         'link',
     ];
 
-    public function formation()
+    public function formation(): BelongsTo
     {
         return $this->belongsTo(Formation::class);
     }
 
-    public function students()
+    public function students(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'certification_student', 'certification_id', 'student_id');
     }

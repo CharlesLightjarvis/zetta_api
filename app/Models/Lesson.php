@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Lesson extends Model
 {
@@ -16,7 +17,7 @@ class Lesson extends Model
         'slug',
     ];
 
-    public function module()
+    public function module(): BelongsTo
     {
         return $this->belongsTo(Module::class);
     }

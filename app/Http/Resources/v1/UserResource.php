@@ -3,9 +3,13 @@
 namespace App\Http\Resources\v1;
 
 use App\Enums\RoleEnum;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property-read User $resource
+ */
 class UserResource extends JsonResource
 {
     /**
@@ -15,20 +19,23 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // Récupérer le rôle une seule fois avec ->value() pour éviter pluck()->first()
+        $roleName = $this->resource->roles()->value('name');
+
         $data = [
-            'id' => $this->id,
-            'fullName' => $this->fullName,
-            'email' => $this->email,
-            'status' => $this->status,
-            'imageUrl' => $this->imageUrl,
-            'role' => $this->roles()->pluck('name')->first(),
-            'created_at' => $this->created_at->format('Y-m-d H:i'),
-            'updated_at' => $this->updated_at->format('Y-m-d H:i'),
+            'id' => $this->resource->id,
+            'fullName' => $this->resource->fullName,
+            'email' => $this->resource->email,
+            'status' => $this->resource->status,
+            'imageUrl' => $this->resource->imageUrl,
+            'role' => $roleName,
+            'created_at' => $this->resource->created_at->format('Y-m-d H:i'),
+            'updated_at' => $this->resource->updated_at->format('Y-m-d H:i'),
         ];
 
-        if ($this->roles()->pluck('name')->first() === RoleEnum::TEACHER->value) {
-            $data['bio'] = $this->bio;
-            $data['title'] = $this->title;
+        if ($roleName === RoleEnum::TEACHER->value) {
+            $data['bio'] = $this->resource->bio;
+            $data['title'] = $this->resource->title;
         }
 
         return $data;

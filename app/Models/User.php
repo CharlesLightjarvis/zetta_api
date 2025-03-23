@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DateTimeInterface;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -47,7 +49,7 @@ class User extends Authenticatable
     /**
      * Sessions où l'utilisateur est enseignant
      */
-    public function teachingSessions()
+    public function teachingSessions(): HasMany
     {
         return $this->hasMany(FormationSession::class, 'teacher_id');
     }
@@ -55,12 +57,12 @@ class User extends Authenticatable
     /**
      * Sessions où l'utilisateur est étudiant
      */
-    public function enrolledSessions()
+    public function enrolledSessions(): BelongsToMany
     {
         return $this->belongsToMany(FormationSession::class, 'session_student', 'student_id', 'session_id');
     }
 
-    public function certifications()
+    public function certifications(): BelongsToMany
     {
         return $this->belongsToMany(Certification::class, 'certification_student', 'student_id', 'certification_id');
     }
