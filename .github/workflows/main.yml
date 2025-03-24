@@ -57,7 +57,5 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /var/www/zetta_api   # Assure-toi d'être dans le bon dossier
-            ls -l                    # Vérifie que build.sh est bien là
-            chmod +x build.sh        # S'il n'est pas exécutable, le rendre exécutable
+            cd ${{ secrets.APP_PATH }}   # Assure-toi d'être dans le bon dossier
             ./build.sh               # Exécution du script
