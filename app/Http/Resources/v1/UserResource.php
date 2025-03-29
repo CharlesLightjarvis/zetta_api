@@ -28,6 +28,7 @@ class UserResource extends JsonResource
             'email' => $this->resource->email,
             'status' => $this->resource->status,
             'imageUrl' => $this->resource->imageUrl,
+            'phone' => $this->resource->phone,
             'role' => $roleName,
             'created_at' => $this->resource->created_at->format('Y-m-d H:i'),
             'updated_at' => $this->resource->updated_at->format('Y-m-d H:i'),

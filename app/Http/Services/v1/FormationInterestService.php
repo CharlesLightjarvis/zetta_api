@@ -13,7 +13,7 @@ class FormationInterestService
 
     public function getAllInterests()
     {
-        return FormationInterestResource::collection(FormationInterest::with('formation')->get());
+        return FormationInterestResource::collection(FormationInterest::with('formation')->orderBy('created_at', 'desc')->get());
     }
 
     public function createInterest($data)
@@ -32,7 +32,7 @@ class FormationInterestService
             broadcast(new NewFormationInterest($interest))->toOthers();
             Log::info('Event broadcasted');
 
-            // DB::commit();
+            DB::commit();
             return true;
         } catch (\Exception $e) {
             DB::rollBack();

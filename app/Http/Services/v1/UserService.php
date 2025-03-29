@@ -12,7 +12,7 @@ class UserService
 {
     public function getAllUsers()
     {
-        return  UserResource::collection(User::all());;
+        return UserResource::collection(User::orderBy('created_at', 'desc')->get());
     }
 
     public function getUserById($id)
