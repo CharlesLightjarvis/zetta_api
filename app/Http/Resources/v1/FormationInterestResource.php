@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\v1;
 
+use App\Models\Category;
+use App\Models\Formation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -34,19 +36,34 @@ class FormationInterestResource extends JsonResource
             "message" => $this->message,
             "status" => $this->status,
             "formation" => $this->whenLoaded('formation', function () {
+                /** @var Formation|null $formation */
+                $formation = $this->formation;
+
+                if ($formation === null) {
+                    return null;
+                }
+
+                $categoryData = null;
+                /** @var Category|null $category */
+                $category = $formation->category;
+
+                if ($category !== null) {
+                    $categoryData = [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                    ];
+                }
+
                 return [
-                    'id' => $this->formation?->id,
-                    'slug' => $this->formation?->slug,
-                    'image' => $this->formation?->image,
-                    'description' => $this->formation?->description,
-                    'duration' => $this->formation?->duration,
-                    'level' => $this->formation?->level,
-                    'price' => $this->formation?->price,
-                    'name' => $this->formation?->name,
-                    'category' => [
-                        'id' => $this->formation?->category?->id,
-                        'name' => $this->formation?->category?->name
-                    ]
+                    'id' => $formation->id,
+                    'slug' => $formation->slug,
+                    'image' => $formation->image,
+                    'description' => $formation->description,
+                    'duration' => $formation->duration,
+                    'level' => $formation->level,
+                    'price' => $formation->price,
+                    'name' => $formation->name,
+                    'category' => $categoryData,
                 ];
             }),
             "created_at" => $this->created_at->format('Y-m-d H:i'),
