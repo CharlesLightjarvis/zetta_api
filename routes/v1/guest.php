@@ -11,9 +11,9 @@ use App\Http\Controllers\v1\LessonController;
 Route::prefix('guest')->group(function () {
     Route::get('formations', [FormationController::class, 'index']);
     Route::get('categories', [CategoryController::class, 'index']);
-    Route::apiResource('lessons', LessonController::class);
-    Route::apiResource('sessions', FormationSessionController::class);
-    Route::apiResource('modules', ModuleController::class);
+    Route::get('lessons', [LessonController::class, 'index']);
+    Route::get('sessions', [FormationSessionController::class, 'index']);
+    Route::get('modules', [ModuleController::class, 'index']);
     Route::get('formations/slug/{slug}', [FormationController::class, 'getFormationBySlug']);
     Route::get('certifications', [CertificationController::class, 'index']);
 });
