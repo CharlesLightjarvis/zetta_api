@@ -26,7 +26,6 @@ class CertificationService
     public function createCertification($data)
     {
         try {
-
             DB::beginTransaction();
 
             // Vérification du slug unique
@@ -45,6 +44,14 @@ class CertificationService
 
             // Ajout du slug aux données
             $data['slug'] = $slug;
+
+            // S'assurer que les tableaux sont bien initialisés même s'ils sont vides
+            $arrayFields = ['benefits', 'skills', 'best_for', 'prerequisites'];
+            foreach ($arrayFields as $field) {
+                if (!isset($data[$field])) {
+                    $data[$field] = [];
+                }
+            }
 
             // Création de la certification
             $certification = Certification::create($data);
@@ -86,6 +93,20 @@ class CertificationService
                 $formation = Formation::find($data['formation_id']);
                 if (!$formation) {
                     return false;
+                }
+            }
+
+            // Gérer les champs de type tableau
+            $arrayFields = ['benefits', 'skills', 'best_for', 'prerequisites'];
+            foreach ($arrayFields as $field) {
+                if (isset($data[$field])) {
+                    // S'assurer que le champ est un tableau
+                    if (!is_array($data[$field])) {
+                        $data[$field] = [];
+                    }
+                } else {
+                    // Conserver les valeurs existantes si non fournies
+                    $data[$field] = $certification->$field ?? [];
                 }
             }
 

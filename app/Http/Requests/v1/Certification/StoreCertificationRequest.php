@@ -30,7 +30,13 @@ class StoreCertificationRequest extends FormRequest
             'formation_id' => 'required|uuid|exists:formations,id',
             'level' => 'required|string|max:255',
             'benefits' => 'nullable|array',
-            'link' => 'nullable|string|max:255',
+            'benefits.*' => 'nullable|string',  // Ajout de la validation pour chaque élément
+            'best_for' => 'nullable|array',
+            'best_for.*' => 'nullable|string',  // Ajout de la validation pour chaque élément
+            'prerequisites' => 'nullable|array',
+            'prerequisites.*' => 'nullable|string',  // Ajout de la validation pour chaque élément
+            'skills' => 'nullable|array',
+            'skills.*' => 'nullable|string',    // Ajout de la validation pour chaque élément
         ];
     }
 }

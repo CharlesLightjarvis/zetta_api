@@ -27,6 +27,11 @@ class Certification extends Model
         'link',
     ];
 
+    public function getLinkAttribute(): string
+    {
+        return "/certifications/" . $this->slug;
+    }
+
     public function formation(): BelongsTo
     {
         return $this->belongsTo(Formation::class);

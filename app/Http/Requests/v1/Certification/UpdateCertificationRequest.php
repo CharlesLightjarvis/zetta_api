@@ -30,7 +30,13 @@ class UpdateCertificationRequest extends FormRequest
             'formation_id' => 'sometimes|required|uuid|exists:formations,id',
             'level' => 'sometimes|required|string|max:255',
             'benefits' => 'sometimes|nullable|array',
-            'link' => 'sometimes|nullable|string|max:255',
+            'benefits.*' => 'sometimes|nullable|string',  // Ajout de la validation pour chaque élément
+            'best_for' => 'sometimes|nullable|array',
+            'best_for.*' => 'sometimes|nullable|string',  // Ajout de la validation pour chaque élément
+            'prerequisites' => 'sometimes|nullable|array',
+            'prerequisites.*' => 'sometimes|nullable|string',  // Ajout de la validation pour chaque élément
+            'skills' => 'sometimes|nullable|array',
+            'skills.*' => 'sometimes|nullable|string',    // Ajout de la validation pour chaque élément
         ];
     }
 }
