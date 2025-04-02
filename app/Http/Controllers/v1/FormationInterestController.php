@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\v1\Interest\StoreFormationInterestRequest;
 use App\Http\Requests\v1\Interest\UpdateFormationInterestRequest;
 use App\Http\Services\V1\FormationInterestService;
+use App\Models\FormationInterest;
 use App\Trait\ApiResponse;
 
 class FormationInterestController extends Controller
@@ -62,5 +63,22 @@ class FormationInterestController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function approve($id)
+    {
+        try {
+            $interest = FormationInterest::where('id', $id)->firstOrFail();
+
+            $result = $this->interestService->approveInterest($interest);
+
+            if ($result) {
+                return $this->successNoData('Interest approved successfully');
+            }
+
+            return $this->errorResponse('Failed to approve interest', 400);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 404);
+        }
     }
 }

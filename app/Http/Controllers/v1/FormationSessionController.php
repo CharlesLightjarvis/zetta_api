@@ -72,4 +72,28 @@ class FormationSessionController extends Controller
         }
         return $this->errorResponse('Session not found or failed to delete', 400);
     }
+
+    public function getSessionStudents($sessionId)
+    {
+        $students = $this->sessionService->getSessionStudents($sessionId);
+        return $this->successResponse('Students retrieved successfully', 'students', $students);
+    }
+
+    public function enrollStudent($sessionId, $studentId)
+    {
+        $is_enrolled = $this->sessionService->enrollStudent($studentId, $sessionId);
+        if ($is_enrolled) {
+            return $this->successNoData('Student enrolled successfully');
+        }
+        return $this->errorResponse('Failed to enroll student', 400);
+    }
+
+    public function unenrollStudent($sessionId, $studentId)
+    {
+        $is_unenrolled = $this->sessionService->unenrollStudent($studentId, $sessionId);
+        if ($is_unenrolled) {
+            return $this->successNoData('Student unenrolled successfully');
+        }
+        return $this->errorResponse('Failed to unenroll student', 400);
+    }
 }

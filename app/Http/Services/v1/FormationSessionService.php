@@ -3,21 +3,37 @@
 namespace App\Http\Services\V1;
 
 use App\Http\Resources\v1\FormationSessionResource;
+use App\Http\Resources\v1\UserResource;
 use App\Models\Formation;
 use App\Models\FormationSession;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class FormationSessionService
 {
+    // public function getAllSessions()
+    // {
+    //     return FormationSessionResource::collection(FormationSession::with('formation', 'teacher')->get());
+    // }
+
     public function getAllSessions()
     {
-        return FormationSessionResource::collection(FormationSession::with('formation', 'teacher')->get());
+        return FormationSessionResource::collection(
+            FormationSession::with('formation', 'teacher', 'students')->get()
+        );
     }
+
+    // public function getSessionById($id)
+    // {
+    //     return new FormationSessionResource(FormationSession::with('formation', 'teacher')->findOrFail($id));
+    // }
 
     public function getSessionById($id)
     {
-        return new FormationSessionResource(FormationSession::with('formation', 'teacher')->findOrFail($id));
+        return new FormationSessionResource(
+            FormationSession::with('formation', 'teacher', 'students')->findOrFail($id)
+        );
     }
 
     public function createSession($data)
@@ -39,8 +55,7 @@ class FormationSessionService
                 }
             }
 
-            // Créer la session
-            $session = FormationSession::create($data);
+            FormationSession::create($data);
 
             DB::commit();
             return true;
@@ -87,9 +102,134 @@ class FormationSessionService
         }
     }
 
+    // public function deleteSession($id)
+    // {
+    //     $session = FormationSession::find($id);
+    //     return $session ? $session->delete() : false;
+    // }
+
     public function deleteSession($id)
     {
-        $session = FormationSession::find($id);
-        return $session ? $session->delete() : false;
+        try {
+            $session = FormationSession::find($id);
+            if (!$session) {
+                return false;
+            }
+
+            // Supprimer toutes les inscriptions d'étudiants
+            $session->students()->detach();
+
+            return $session->delete();
+        } catch (\Exception $e) {
+            Log::error('Failed to delete session', ['error' => $e->getMessage()]);
+            return false;
+        }
     }
+
+    public function enrollStudent($studentId, $sessionId)
+    {
+        try {
+            DB::beginTransaction();
+
+            // 1. D'abord trouver la session
+            $session = FormationSession::find($sessionId);
+            if (!$session) {
+                throw new \Exception('Session not found');
+            }
+
+            // 2. Trouver l'étudiant
+            $student = User::find($studentId);
+            if (!$student) {
+                throw new \Exception('Student not found');
+            }
+
+            // 3. Vérifier si l'étudiant a le rôle approprié
+            if (!$student->hasRole('student')) {
+                throw new \Exception('User must be a student to enroll');
+            }
+
+            // 4. Vérifier s'il y a des places disponibles
+            if ($session->enrolled_students >= $session->capacity) {
+                throw new \Exception('Session is full');
+            }
+
+            // 5. Vérifier si l'étudiant n'est pas déjà inscrit
+            if ($session->students()->where('users.id', $studentId)->exists()) {
+                throw new \Exception('Student already enrolled');
+            }
+
+            // 6. Inscrire l'étudiant
+            $session->students()->attach($studentId);
+            $session->increment('enrolled_students');
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Failed to enroll student', [
+                'student_id' => $studentId,
+                'session_id' => $sessionId,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    public function unenrollStudent($studentId, $sessionId)
+    {
+        try {
+            DB::beginTransaction();
+
+            // 1. Trouver la session
+            $session = FormationSession::find($sessionId);
+            if (!$session) {
+                throw new \Exception('Session not found');
+            }
+
+            // 2. Vérifier si l'étudiant est inscrit
+            if (!$session->students()->where('users.id', $studentId)->exists()) {
+                throw new \Exception('Student not enrolled in this session');
+            }
+
+            // 3. Désinscrire l'étudiant
+            $session->students()->detach($studentId);
+
+            // 4. Mettre à jour le nombre d'étudiants inscrits
+            $session->decrement('enrolled_students');
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Failed to unenroll student', [
+                'student_id' => $studentId,
+                'session_id' => $sessionId,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    public function getAvailableSessions($formationId)
+    {
+        return FormationSession::where('formation_id', $formationId)
+            ->where('start_date', '>=', now()->startOfDay())
+            ->whereRaw('enrolled_students < capacity')
+            ->orderBy('start_date')
+            ->get(); // Changé first() en get() pour retourner une collection
+    }
+
+    public function getSessionStudents($sessionId)
+    {
+        $session = FormationSession::findOrFail($sessionId);
+        return UserResource::collection(
+            $session->students()->get()
+        );
+    }
+
+    // public function checkAvailability($sessionId)
+    // {
+    //     $session = FormationSession::find($sessionId);
+    //     return $session ? $session->hasAvailableSpots() : false;
+    // }
 }

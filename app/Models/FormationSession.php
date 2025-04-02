@@ -40,7 +40,7 @@ class FormationSession extends Model
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'session_student', 'session_id', 'student_id');
+        return $this->belongsToMany(User::class, 'session_student', 'session_id', 'student_id')->withTimestamps();
     }
 
     // check if the session has available spots

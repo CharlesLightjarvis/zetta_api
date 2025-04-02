@@ -83,6 +83,9 @@ class UserService
             }
 
             $user->syncRoles([]);
+            // Supprimer manuellement les relations
+            $user->enrolledSessions()->detach();
+
             // $user->removeMedia();
             $user->delete(); // Suppression définitive
 

@@ -5,9 +5,10 @@ namespace App\Enums;
 enum InterestStatusEnum: string
 {
     case PENDING = 'pending';
-    case CONTACTED = 'contacted';
-    case ENROLLED = 'enrolled';
-    case CANCELLED = 'cancelled';
+    case APPROVED = 'approved';
+    case REJECTED = 'rejected';
+
+
 
     public static function values(): array
     {

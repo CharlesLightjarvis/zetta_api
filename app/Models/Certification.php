@@ -39,7 +39,7 @@ class Certification extends Model
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'certification_student', 'certification_id', 'student_id');
+        return $this->belongsToMany(User::class, 'certification_students', 'certification_id', 'student_id')->withTimestamps();
     }
 
     protected function casts(): array
