@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             ModuleSeeder::class,      // 5. Crée les modules
             LessonSeeder::class,      // 6. Crée les leçons
             FormationSessionSeeder::class, // 7. Crée les sessions de formation
+            QuizSeeder::class,        // 8. Crée les configurations et questions pour les quiz
         ]);
     }
 }

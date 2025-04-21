@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Certification extends Model
 {
@@ -42,6 +43,12 @@ class Certification extends Model
         return $this->belongsToMany(User::class, 'certification_students', 'certification_id', 'student_id')->withTimestamps();
     }
 
+    // Add this relationship
+    public function progressTrackings(): MorphMany
+    {
+        return $this->morphMany(ProgressTracking::class, 'trackable');
+    }
+
     protected function casts(): array
     {
         return [
@@ -50,5 +57,15 @@ class Certification extends Model
             'best_for' => 'array',
             'prerequisites' => 'array',
         ];
+    }
+
+    public function quizConfiguration()
+    {
+        return $this->morphOne(QuizConfiguration::class, 'configurable');
+    }
+
+    public function questions()
+    {
+        return $this->morphMany(Question::class, 'questionable');
     }
 }

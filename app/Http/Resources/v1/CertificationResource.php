@@ -46,7 +46,8 @@ class CertificationResource extends JsonResource
             "formation" => $this->whenLoaded('formation', function () {
                 return [
                     'id' => $this->formation?->id,
-                    'name' => $this->formation?->name
+                    'name' => $this->formation?->name,
+                    'category' => $this->formation?->category?->name
                 ];
             }),
             "prerequisites" => $this->prerequisites,

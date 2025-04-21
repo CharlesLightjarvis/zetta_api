@@ -57,6 +57,49 @@ class FormationInterestService
         }
     }
 
+    // public function approveInterest(FormationInterest $interest): bool
+    // {
+    //     try {
+    //         DB::beginTransaction();
+
+    //         // 1. Créer le compte utilisateur
+    //         $result = $this->createUserAccount($interest);
+    //         if (!$result) {
+    //             throw new \Exception('Failed to create user account');
+    //         }
+    //         ['user' => $user, 'password' => $password] = $result;
+
+    //         // 2. Trouver une session disponible
+    //         $availableSessions = $this->sessionService->getAvailableSessions($interest->formation_id);
+    //         if ($availableSessions->isEmpty()) {
+    //             throw new \Exception('No available session found');
+    //         }
+    //         $session = $availableSessions->first();
+
+    //         // 3. Inscrire à la session
+    //         if (!$this->sessionService->enrollStudent($user, $session)) {
+    //             throw new \Exception('Failed to enroll in session');
+    //         }
+
+    //         // 4. Marquer comme traité
+    //         $interest->status = InterestStatusEnum::APPROVED->value;
+    //         $interest->save();
+
+    //         // 5. Envoyer l'email
+    //         Mail::to($user->email)->send(new InterestApproved($interest, $user, $password));
+
+    //         DB::commit();
+    //         return true;
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Interest processing failed', [
+    //             'interest_id' => $interest->id,
+    //             'error' => $e->getMessage()
+    //         ]);
+    //         return false;
+    //     }
+    // }
+
     public function approveInterest(FormationInterest $interest): bool
     {
         try {
@@ -69,23 +112,28 @@ class FormationInterestService
             }
             ['user' => $user, 'password' => $password] = $result;
 
-            // 2. Trouver une session disponible
+            // 2. Inscrire à la formation
+            $formation = $interest->formation;
+            $formation->students()->attach($user->id);
+
+            // 3. Trouver une session disponible
             $availableSessions = $this->sessionService->getAvailableSessions($interest->formation_id);
             if ($availableSessions->isEmpty()) {
                 throw new \Exception('No available session found');
             }
             $session = $availableSessions->first();
 
-            // 3. Inscrire à la session
-            if (!$this->sessionService->enrollStudent($user, $session)) {
+            // 4. Inscrire à la session
+            // 4. Inscrire à la session
+            if (!$this->sessionService->enrollStudent($user->id, $session->id)) {
                 throw new \Exception('Failed to enroll in session');
             }
 
-            // 4. Marquer comme traité
+            // 5. Marquer comme traité
             $interest->status = InterestStatusEnum::APPROVED->value;
             $interest->save();
 
-            // 5. Envoyer l'email
+            // 6. Envoyer l'email
             Mail::to($user->email)->send(new InterestApproved($interest, $user, $password));
 
             DB::commit();

@@ -37,7 +37,7 @@ class Formation extends Model
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'formation_student', 'formation_id', 'student_id');
+        return $this->belongsToMany(User::class, 'formation_student', 'formation_id', 'student_id')->withTimestamps();
     }
 
     public function certifications(): HasMany
