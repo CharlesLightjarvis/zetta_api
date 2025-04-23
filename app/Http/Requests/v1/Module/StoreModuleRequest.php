@@ -23,8 +23,12 @@ class StoreModuleRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'formation_id' => 'required|uuid|exists:formations,id',
             'description' => 'nullable|string|max:1000',
+            'formation_ids' => 'nullable|array',
+            'formation_ids.*' => 'required|uuid|exists:formations,id',
+            'lessons' => 'nullable|array',
+            'lessons.*.name' => 'required|string|max:255',
+            'lessons.*.description' => 'nullable|string|max:1000',
         ];
     }
 }

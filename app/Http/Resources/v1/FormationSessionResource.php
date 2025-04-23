@@ -30,6 +30,7 @@ class FormationSessionResource extends JsonResource
             "enrolled_students" => $this->resource->enrolled_students,
             "formation" => $this->whenLoaded('formation', fn(): array => $this->getFormationData()),
             "teacher" => $this->whenLoaded('teacher', fn(): UserResource => new UserResource($this->resource->teacher)),
+            "students" => $this->whenLoaded('students', fn(): array => UserResource::collection($this->resource->students)->toArray($request)),
             "created_at" => $this->resource->created_at->format('Y-m-d H:i'),
             "updated_at" => $this->resource->updated_at->format('Y-m-d H:i'),
         ];

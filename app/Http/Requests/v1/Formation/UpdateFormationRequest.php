@@ -4,6 +4,7 @@ namespace App\Http\Requests\v1\Formation;
 
 use App\Enums\CourseTypeEnum;
 use App\Enums\LevelEnum;
+use App\Models\FormationSession;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -36,6 +37,44 @@ class UpdateFormationRequest extends FormRequest
             'prerequisites.*' => 'sometimes|nullable|string',
             'objectives' => 'sometimes|nullable|array',
             'objectives.*' => 'sometimes|nullable|string',
+            'module_ids' => 'sometimes|nullable|array',
+            'module_ids.*' => 'required|uuid|exists:modules,id',
+            // Ajout des règles pour les sessions
+            'sessions' => 'sometimes|nullable|array',
+            'sessions.*.teacher_id' => 'nullable|uuid|exists:users,id',
+            'sessions.*.course_type' => ['required', 'string', Rule::enum(CourseTypeEnum::class)],
+            'sessions.*.start_date' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+                function ($attribute, $value, $fail) {
+                    $formationId = $this->route('formation');
+                    $sessionId = $this->input(explode('.', $attribute)[1] . '.id');
+
+                    $exists = FormationSession::where('formation_id', $formationId)
+                        ->where('start_date', $value)
+                        ->when($sessionId, function ($query) use ($sessionId) {
+                            return $query->where('id', '!=', $sessionId);
+                        })
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('A session already exists for this formation on this date.');
+                    }
+                }
+            ],
+            'sessions.*.end_date' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) {
+                    $index = explode('.', $attribute)[1];
+                    $startDate = $this->input("sessions.{$index}.start_date");
+                    if ($startDate && $value <= $startDate) {
+                        $fail('End date must be after start date.');
+                    }
+                }
+            ],
+            'sessions.*.capacity' => 'required|integer|min:1',
         ];
     }
 }

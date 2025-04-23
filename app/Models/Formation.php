@@ -45,9 +45,9 @@ class Formation extends Model
         return $this->hasMany(Certification::class);
     }
 
-    public function modules()
+    public function modules(): BelongsToMany
     {
-        return $this->hasMany(Module::class);
+        return $this->belongsToMany(Module::class, 'formation_modules', 'formation_id', 'module_id')->withTimestamps();
     }
 
     public function sessions()

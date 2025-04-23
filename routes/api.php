@@ -8,5 +8,6 @@ Route::prefix('v1')->group(function () {
     require __DIR__ . '/v1/student.php';
     require __DIR__ . '/v1/guest.php';
     require __DIR__ . '/v1/admin.php';
+    require __DIR__ . '/v1/teacher.php';
     require __DIR__ . '/v1/auth.php';
 });

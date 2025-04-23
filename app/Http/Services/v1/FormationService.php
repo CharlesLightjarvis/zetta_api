@@ -5,6 +5,7 @@ namespace App\Http\Services\V1;
 use App\Http\Resources\v1\FormationResource;
 use App\Models\Category;
 use App\Models\Formation;
+use App\Models\Module;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -30,6 +31,7 @@ class FormationService
     {
         try {
             DB::beginTransaction();
+
             $slug = Str::slug($data['name']);
             $formation = Formation::where('slug', $slug)->exists();
             if ($formation) {
@@ -38,7 +40,6 @@ class FormationService
             $data['slug'] = $slug;
 
             $category = Category::find($data['category_id']);
-            // Vérifier si la catégorie existe
             if (!$category) {
                 return false;
             }
@@ -48,6 +49,22 @@ class FormationService
             $data['objectives'] = isset($data['objectives']) ? array_filter($data['objectives']) : null;
 
             $formation = Formation::create($data);
+
+            // Attacher les modules si fournis
+            if (isset($data['module_ids']) && is_array($data['module_ids'])) {
+                $modules = Module::whereIn('id', $data['module_ids'])->get();
+                if ($modules->count() > 0) {
+                    $formation->modules()->attach($modules);
+                }
+            }
+
+            // Créer les sessions si fournies
+            if (isset($data['sessions']) && is_array($data['sessions'])) {
+                foreach ($data['sessions'] as $sessionData) {
+                    $sessionData['formation_id'] = $formation->id;
+                    $formation->sessions()->create($sessionData);
+                }
+            }
 
             DB::commit();
             return true;
@@ -67,7 +84,6 @@ class FormationService
                 return false;
             }
 
-            // Si le nom est modifié, vérifier que le nouveau slug n'existe pas déjà
             if (isset($data['name'])) {
                 $newSlug = Str::slug($data['name']);
                 if ($newSlug !== $formation->slug) {
@@ -81,7 +97,6 @@ class FormationService
                 }
             }
 
-            // Vérifier la catégorie si l'ID est modifié
             if (isset($data['category_id'])) {
                 $category = Category::find($data['category_id']);
                 if (!$category) {
@@ -89,7 +104,6 @@ class FormationService
                 }
             }
 
-            // Traiter les prerequisites et objectives
             if (isset($data['prerequisites'])) {
                 $data['prerequisites'] = array_filter($data['prerequisites']);
             }
@@ -98,6 +112,40 @@ class FormationService
             }
 
             $formation->update($data);
+
+            // Mise à jour des modules si fournis
+            if (isset($data['module_ids'])) {
+                $modules = Module::whereIn('id', $data['module_ids'])->get();
+                $formation->modules()->sync($modules);
+            }
+
+            // Mise à jour des sessions si fournies
+            if (isset($data['sessions'])) {
+                $existingSessionIds = $formation->sessions()->pluck('id')->toArray();
+                $updatedSessionIds = [];
+
+                foreach ($data['sessions'] as $sessionData) {
+                    if (isset($sessionData['id'])) {
+                        // Mise à jour d'une session existante
+                        $session = $formation->sessions()->find($sessionData['id']);
+                        if ($session) {
+                            $session->update($sessionData);
+                            $updatedSessionIds[] = $session->id;
+                        }
+                    } else {
+                        // Création d'une nouvelle session
+                        $sessionData['formation_id'] = $formation->id;
+                        $session = $formation->sessions()->create($sessionData);
+                        $updatedSessionIds[] = $session->id;
+                    }
+                }
+
+                // Suppression des sessions qui ne sont plus dans la liste
+                $sessionsToDelete = array_diff($existingSessionIds, $updatedSessionIds);
+                if (!empty($sessionsToDelete)) {
+                    $formation->sessions()->whereIn('id', $sessionsToDelete)->delete();
+                }
+            }
 
             DB::commit();
             return true;

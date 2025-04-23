@@ -27,7 +27,7 @@ class ModuleResource extends JsonResource
             "name" => $this->resource->name,
             "slug" => $this->resource->slug,
             "description" => $this->resource->description,
-            "formation" => $this->whenLoaded('formation', fn(): array => $this->getFormationData()),
+            "formations" => $this->whenLoaded('formations', fn(): array => $this->getFormationsData()),
             "lessons" => $this->whenLoaded('lessons', fn(): array => $this->getLessonsData()),
             "created_at" => $this->resource->created_at->format('Y-m-d H:i'),
             "updated_at" => $this->resource->updated_at->format('Y-m-d H:i'),
@@ -35,17 +35,16 @@ class ModuleResource extends JsonResource
     }
 
     /**
-     * Get formatted formation data
+     * Get formatted formations data
      */
-    private function getFormationData(): array
+    private function getFormationsData(): array
     {
-        /** @var Formation $formation */
-        $formation = $this->resource->formation;
-
-        return [
-            'id' => $formation->id,
-            'name' => $formation->name
-        ];
+        return $this->resource->formations->map(function (Formation $formation): array {
+            return [
+                'id' => $formation->id,
+                'name' => $formation->name
+            ];
+        })->toArray();
     }
 
     /**
@@ -57,7 +56,8 @@ class ModuleResource extends JsonResource
             /** @var Lesson $model */
             return [
                 'id' => $model->id,
-                'name' => $model->name
+                'name' => $model->name,
+                'description' => $model->description
             ];
         })->toArray();
     }

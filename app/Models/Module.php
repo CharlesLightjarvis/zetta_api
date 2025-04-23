@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Module extends Model
@@ -18,9 +18,9 @@ class Module extends Model
         'description',
     ];
 
-    public function formation(): BelongsTo
+    public function formations(): BelongsToMany
     {
-        return $this->belongsTo(Formation::class);
+        return $this->belongsToMany(Formation::class, 'formation_modules', 'module_id', 'formation_id')->withTimestamps();
     }
 
     public function lessons(): HasMany

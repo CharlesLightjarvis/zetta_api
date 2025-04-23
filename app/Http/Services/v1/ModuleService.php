@@ -12,11 +12,16 @@ class ModuleService
 {
     public function getAllModules()
     {
-        return ModuleResource::collection(Module::with('formation', 'lessons')->get());
+        return ModuleResource::collection(
+            Module::with('formations', 'lessons')->get()
+        );
     }
+
     public function getModuleById($id)
     {
-        return new ModuleResource(Module::with('formation', 'lessons')->findOrFail($id));
+        return new ModuleResource(
+            Module::with('formations', 'lessons')->findOrFail($id)
+        );
     }
 
     public function createModule($data)
@@ -26,22 +31,36 @@ class ModuleService
 
             // Vérification du slug unique
             $slug = Str::slug($data['name']);
-            $module = Module::where('slug', $slug)->exists();
-            if ($module) {
+            $moduleExists = Module::where('slug', $slug)->exists();
+            if ($moduleExists) {
                 return false;
             }
-
-            // Vérification si la formation existe
-            $formation = Formation::find($data['formation_id']);
-            if (!$formation) {
-                return false;
-            }
-
-            // Ajout du slug aux données
-            $data['slug'] = $slug;
 
             // Création du module
-            $module = Module::create($data);
+            $module = Module::create([
+                'name' => $data['name'],
+                'slug' => $slug,
+                'description' => $data['description'] ?? null,
+            ]);
+
+            // Attacher les formations si fournies
+            if (isset($data['formation_ids']) && is_array($data['formation_ids'])) {
+                $formations = Formation::whereIn('id', $data['formation_ids'])->get();
+                if ($formations->count() > 0) {
+                    $module->formations()->attach($formations);
+                }
+            }
+
+            // Création des leçons si fournies
+            if (isset($data['lessons']) && is_array($data['lessons'])) {
+                foreach ($data['lessons'] as $lessonData) {
+                    $module->lessons()->create([
+                        'name' => $lessonData['name'],
+                        'slug' => Str::slug($lessonData['name']),
+                        'description' => $lessonData['description'] ?? null,
+                    ]);
+                }
+            }
 
             DB::commit();
             return true;
@@ -75,15 +94,32 @@ class ModuleService
                 }
             }
 
-            // Vérifier la formation si l'ID est modifié
-            if (isset($data['formation_id'])) {
-                $formation = Formation::find($data['formation_id']);
-                if (!$formation) {
-                    return false;
-                }
+            $module->update([
+                'name' => $data['name'] ?? $module->name,
+                'slug' => $data['slug'] ?? $module->slug,
+                'description' => $data['description'] ?? $module->description,
+            ]);
+
+            // Mise à jour des formations si fournies
+            if (isset($data['formation_ids'])) {
+                $formations = Formation::whereIn('id', $data['formation_ids'])->get();
+                $module->formations()->sync($formations);
             }
 
-            $module->update($data);
+            // Mise à jour des leçons si fournies
+            if (isset($data['lessons']) && is_array($data['lessons'])) {
+                // Supprimer les leçons existantes
+                $module->lessons()->delete();
+
+                // Créer les nouvelles leçons
+                foreach ($data['lessons'] as $lessonData) {
+                    $module->lessons()->create([
+                        'name' => $lessonData['name'],
+                        'slug' => Str::slug($lessonData['name']),
+                        'description' => $lessonData['description'] ?? null,
+                    ]);
+                }
+            }
 
             DB::commit();
             return true;
@@ -96,9 +132,26 @@ class ModuleService
     public function deleteModule($id)
     {
         try {
+            DB::beginTransaction();
+
             $module = Module::find($id);
-            return $module ? $module->delete() : false;
+            if (!$module) {
+                return false;
+            }
+
+            // Les relations avec les formations seront automatiquement supprimées 
+            // grâce à la configuration de la table pivot
+
+            // Supprimer les leçons
+            $module->lessons()->delete();
+
+            // Supprimer le module
+            $module->delete();
+
+            DB::commit();
+            return true;
         } catch (\Exception $e) {
+            DB::rollback();
             return false;
         }
     }
