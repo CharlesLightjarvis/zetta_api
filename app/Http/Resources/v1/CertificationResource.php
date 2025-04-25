@@ -4,6 +4,7 @@ namespace App\Http\Resources\v1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property int $id
@@ -37,7 +38,7 @@ class CertificationResource extends JsonResource
             "name" => $this->name,
             "slug" => $this->slug,
             "description" => $this->description,
-            "image" => $this->image,
+            "image" => $this->image ? config('app.url') . Storage::url($this->image) : null,
             "provider" => $this->provider,
             "validity_period" => $this->validity_period,
             "level" => $this->level,

@@ -28,7 +28,7 @@ class UpdateFormationRequest extends FormRequest
         return [
             'name' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|nullable|string|max:1000',
-            'image' => 'sometimes|nullable|string|max:255',
+            'image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Modifié
             'level' => ['sometimes', Rule::enum(LevelEnum::class)],
             'duration' => 'sometimes|integer|min:1',
             'price' => 'sometimes|integer|min:0',

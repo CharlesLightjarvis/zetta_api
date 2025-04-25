@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property-read Formation $resource
@@ -33,7 +34,7 @@ class FormationResource extends JsonResource
             "name" => $this->resource->name,
             "slug" => $this->resource->slug,
             "description" => $this->resource->description,
-            "image" => $this->resource->image,
+            "image" => $this->resource->image ? config('app.url') . Storage::url($this->resource->image) : null,
             "level" => $this->resource->level,
             "duration" => $this->resource->duration,
             "price" => $this->resource->price,
@@ -60,7 +61,8 @@ class FormationResource extends JsonResource
             /** @var Certification $certification */
             return [
                 'id' => $certification->id,
-                'name' => $certification->name
+                'name' => $certification->name,
+                "image" => $certification->image ? config('app.url') . Storage::url($certification->image) : null,
             ];
         })->toArray();
     }

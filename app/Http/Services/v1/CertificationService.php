@@ -6,6 +6,7 @@ use App\Http\Resources\v1\CertificationResource;
 use App\Models\Certification;
 use App\Models\Formation;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 
@@ -28,9 +29,14 @@ class CertificationService
         try {
             DB::beginTransaction();
 
+            // Gestion de l'image
+            if (isset($data['image']) && $data['image']->isValid()) {
+                $imagePath = $data['image']->store('certifications', 'public');
+                $data['image'] = $imagePath;
+            }
+
             // Vérification du slug unique
             $slug = Str::slug($data['name']);
-
             $certification = Certification::where('slug', $slug)->exists();
             if ($certification) {
                 return false;
@@ -60,6 +66,9 @@ class CertificationService
             return true;
         } catch (\Exception $e) {
             DB::rollback();
+            if (isset($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
             return false;
         }
     }
@@ -72,6 +81,16 @@ class CertificationService
             $certification = Certification::find($id);
             if (!$certification) {
                 return false;
+            }
+
+            // Gestion de l'image
+            if (isset($data['image']) && $data['image']->isValid()) {
+                // Supprimer l'ancienne image si elle existe
+                if ($certification->image) {
+                    Storage::disk('public')->delete($certification->image);
+                }
+                $imagePath = $data['image']->store('certifications', 'public');
+                $data['image'] = $imagePath;
             }
 
             // Si le nom est modifié, vérifier que le nouveau slug n'existe pas déjà
@@ -100,12 +119,10 @@ class CertificationService
             $arrayFields = ['benefits', 'skills', 'best_for', 'prerequisites'];
             foreach ($arrayFields as $field) {
                 if (isset($data[$field])) {
-                    // S'assurer que le champ est un tableau
                     if (!is_array($data[$field])) {
                         $data[$field] = [];
                     }
                 } else {
-                    // Conserver les valeurs existantes si non fournies
                     $data[$field] = $certification->$field ?? [];
                 }
             }
@@ -116,13 +133,30 @@ class CertificationService
             return true;
         } catch (\Exception $e) {
             DB::rollback();
+            if (isset($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
             return false;
         }
     }
 
     public function deleteCertification($id)
     {
-        $certification = Certification::find($id);
-        return $certification ? $certification->delete() : false;
+        try {
+            $certification = Certification::find($id);
+            if (!$certification) {
+                return false;
+            }
+
+            // Supprimer l'image si elle existe
+            if ($certification->image) {
+                Storage::disk('public')->delete($certification->image);
+            }
+
+            $certification->delete();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

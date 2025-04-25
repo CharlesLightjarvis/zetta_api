@@ -24,8 +24,7 @@ class UpdateCertificationRequest extends FormRequest
         return [
             'name' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|nullable|string|max:1000',
-            'image' => 'sometimes|nullable|string|max:255',
-            'provider' => 'sometimes|required|string|max:255',
+            'image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Modifié            'provider' => 'sometimes|required|string|max:255',
             'validity_period' => 'sometimes|required|integer|min:1',
             'formation_id' => 'sometimes|required|uuid|exists:formations,id',
             'level' => 'sometimes|required|string|max:255',

@@ -24,7 +24,7 @@ class StoreCertificationRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'image' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Modifié
             'provider' => 'required|string|max:255',
             'validity_period' => 'required|integer|min:1',
             'formation_id' => 'required|uuid|exists:formations,id',

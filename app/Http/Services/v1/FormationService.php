@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Formation;
 use App\Models\Module;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 
@@ -31,6 +32,12 @@ class FormationService
     {
         try {
             DB::beginTransaction();
+
+            // Gestion de l'image
+            if (isset($data['image']) && $data['image']->isValid()) {
+                $imagePath = $data['image']->store('formations', 'public');
+                $data['image'] = $imagePath;
+            }
 
             $slug = Str::slug($data['name']);
             $formation = Formation::where('slug', $slug)->exists();
@@ -70,6 +77,9 @@ class FormationService
             return true;
         } catch (\Exception $e) {
             DB::rollback();
+            if (isset($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
             return false;
         }
     }
@@ -82,6 +92,17 @@ class FormationService
             $formation = Formation::find($id);
             if (!$formation) {
                 return false;
+            }
+
+
+            // Gestion de l'image
+            if (isset($data['image']) && $data['image']->isValid()) {
+                // Supprimer l'ancienne image si elle existe
+                if ($formation->image) {
+                    Storage::disk('public')->delete($formation->image);
+                }
+                $imagePath = $data['image']->store('formations', 'public');
+                $data['image'] = $imagePath;
             }
 
             if (isset($data['name'])) {

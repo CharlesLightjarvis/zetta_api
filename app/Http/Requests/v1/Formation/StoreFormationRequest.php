@@ -28,7 +28,7 @@ class StoreFormationRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'image' => 'nullable|string|max:255',
+            'image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Modifié
             'level' => ['required', Rule::enum(LevelEnum::class)],
             'duration' => 'required|integer|min:1',
             'price' => 'required|integer|min:0',

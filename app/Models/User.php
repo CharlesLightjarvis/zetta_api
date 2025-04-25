@@ -70,4 +70,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Formation::class, 'formation_student', 'student_id', 'formation_id')->withTimestamps();
     }
+
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
+    }
 }
