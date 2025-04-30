@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\v1\PaymentController;
 use App\Http\Controllers\v1\StudentCertificationController;
 use App\Http\Controllers\v1\StudentFormationController;
 use Illuminate\Support\Facades\Route;
@@ -17,4 +18,7 @@ Route::prefix('student')->group(function () {
 
     Route::post('certifications/{certificationId}/quiz/submit', [StudentCertificationController::class, 'submitQuiz']);
     Route::get('certifications/{certificationId}/quiz-results/{progressTrackingId}', [StudentCertificationController::class, 'getQuizResult']);
+
+    // Dans le groupe student existant
+    Route::get('payments', [PaymentController::class, 'studentPayments']);
 });

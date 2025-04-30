@@ -11,6 +11,8 @@ class QuizConfiguration extends Model
     use HasUuids;
 
     protected $fillable = [
+        'configurable_type',
+        'configurable_id',
         'total_questions',
         'difficulty_distribution',
         'passing_score',

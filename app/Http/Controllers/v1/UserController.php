@@ -72,4 +72,10 @@ class UserController extends Controller
         }
         return $this->errorResponse('User not found', 404);
     }
+
+    public function getStudents()
+    {
+        $students = $this->userService->getStudents();
+        return $this->successResponse('Students retrieved successfully', 'students', $students);
+    }
 }

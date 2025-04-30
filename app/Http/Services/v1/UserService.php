@@ -95,4 +95,11 @@ class UserService
             return false;
         }
     }
+
+    public function getStudents()
+    {
+        return UserResource::collection(User::whereHas('roles', function ($query) {
+            $query->where('name', 'student');
+        })->get());
+    }
 }

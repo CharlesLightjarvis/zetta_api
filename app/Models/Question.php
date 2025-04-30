@@ -11,6 +11,8 @@ class Question extends Model
     use HasUuids;
 
     protected $fillable = [
+        'questionable_type',
+        'questionable_id',
         'question',
         'answers',
         'difficulty',

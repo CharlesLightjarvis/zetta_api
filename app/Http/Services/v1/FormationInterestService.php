@@ -116,24 +116,25 @@ class FormationInterestService
             $formation = $interest->formation;
             $formation->students()->attach($user->id);
 
-            // 3. Trouver une session disponible
-            $availableSessions = $this->sessionService->getAvailableSessions($interest->formation_id);
-            if ($availableSessions->isEmpty()) {
+            // 3. Inscrire à la première session disponible de la formation
+            $session = $formation->sessions()
+                ->where('enrolled_students', '<', DB::raw('capacity'))
+                ->orderBy('start_date')
+                ->first();
+
+            if (!$session) {
                 throw new \Exception('No available session found');
             }
-            $session = $availableSessions->first();
 
-            // 4. Inscrire à la session
-            // 4. Inscrire à la session
-            if (!$this->sessionService->enrollStudent($user->id, $session->id)) {
-                throw new \Exception('Failed to enroll in session');
-            }
+            // Inscrire l'étudiant à la session
+            $session->students()->attach($user->id);
+            $session->increment('enrolled_students');
 
-            // 5. Marquer comme traité
+            // 4. Marquer comme traité
             $interest->status = InterestStatusEnum::APPROVED->value;
             $interest->save();
 
-            // 6. Envoyer l'email
+            // 5. Envoyer l'email
             Mail::to($user->email)->send(new InterestApproved($interest, $user, $password));
 
             DB::commit();

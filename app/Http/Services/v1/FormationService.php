@@ -3,10 +3,13 @@
 namespace App\Http\Services\V1;
 
 use App\Http\Resources\v1\FormationResource;
+use App\Http\Resources\v1\UserResource;
 use App\Models\Category;
 use App\Models\Formation;
 use App\Models\Module;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -180,5 +183,119 @@ class FormationService
     {
         $formation = Formation::find($id);
         return $formation ? $formation->delete() : false;
+    }
+
+    public function enrollExistingStudent(string $formationId, string $studentId): bool
+    {
+        try {
+            DB::beginTransaction();
+
+            // 1. Vérifier si l'étudiant existe et a le rôle étudiant
+            $student = User::findOrFail($studentId);
+            if (!$student->hasRole('student')) {
+                throw new \Exception('User must be a student to enroll');
+            }
+
+            // 2. Vérifier si la formation existe
+            $formation = Formation::findOrFail($formationId);
+
+            // 3. Vérifier si l'étudiant n'est pas déjà inscrit à la formation
+            if ($formation->students()->where('users.id', $studentId)->exists()) {
+                throw new \Exception('Student already enrolled in this formation');
+            }
+
+            // 4. Inscrire à la formation
+            $formation->students()->attach($studentId);
+
+            // 5. Inscrire à la première session disponible
+            $session = $formation->sessions()
+                ->where('enrolled_students', '<', DB::raw('capacity'))
+                ->orderBy('start_date')
+                ->first();
+
+            if (!$session) {
+                throw new \Exception('No available session found');
+            }
+
+            // 6. Vérifier si l'étudiant n'est pas déjà inscrit à la session
+            if (!$session->students()->where('users.id', $studentId)->exists()) {
+                $session->students()->attach($studentId);
+                $session->increment('enrolled_students');
+            }
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to enroll existing student', [
+                'student_id' => $studentId,
+                'formation_id' => $formationId,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    public function unenrollStudent(string $formationId, string $studentId): bool
+    {
+        try {
+            DB::beginTransaction();
+
+            // 1. Vérifier si la formation existe
+            $formation = Formation::findOrFail($formationId);
+
+            // 2. Vérifier si l'étudiant est inscrit à la formation
+            if (!$formation->students()->where('users.id', $studentId)->exists()) {
+                throw new \Exception('Student not enrolled in this formation');
+            }
+
+            // 3. Trouver la session où l'étudiant est inscrit
+            $session = $formation->sessions()
+                ->whereHas('students', function ($query) use ($studentId) {
+                    $query->where('users.id', $studentId);
+                })
+                ->first();
+
+            // 4. Si l'étudiant est inscrit à une session, le désinscrire
+            if ($session) {
+                $session->students()->detach($studentId);
+                $session->decrement('enrolled_students');
+            }
+
+            // 5. Désinscrire de la formation
+            $formation->students()->detach($studentId);
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to unenroll student', [
+                'student_id' => $studentId,
+                'formation_id' => $formationId,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    public function getEnrolledStudents($formationId)
+    {
+        $formation = Formation::findOrFail($formationId);
+        $students = $formation->students()
+            ->select('users.id', 'users.fullName', 'users.email', 'users.imageUrl')
+            ->withPivot('created_at')
+            ->orderBy('users.fullName')
+            ->get()
+            ->map(function ($student) {
+                return [
+                    'id' => $student->id,
+                    'fullName' => $student->fullName,
+                    'email' => $student->email,
+                    'imageUrl' => $student->imageUrl,
+                    'created_at' => $student->pivot->created_at->format('Y-m-d H:i')
+                ];
+            });
+
+        return $students;
     }
 }

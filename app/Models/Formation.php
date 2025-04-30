@@ -67,4 +67,9 @@ class Formation extends Model
             'objectives' => 'array',
         ];
     }
+
+    public function Payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
 }

@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\v1\QuizController;
 use App\Http\Controllers\v1\CertificationController;
 use App\Http\Controllers\v1\FormationController;
 use App\Http\Controllers\v1\FormationInterestController;
 use App\Http\Controllers\v1\FormationSessionController;
 use App\Http\Controllers\v1\LessonController;
 use App\Http\Controllers\v1\ModuleController;
+use App\Http\Controllers\v1\PaymentController;
 use App\Http\Controllers\v1\RoleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\v1\UserController;
@@ -27,4 +29,27 @@ Route::prefix('admin')->group(function () {
     Route::get('sessions/{sessionId}/students', [FormationSessionController::class, 'getSessionStudents']);
     Route::post('sessions/{sessionId}/students/{studentId}', [FormationSessionController::class, 'enrollStudent']);
     Route::delete('sessions/{sessionId}/students/{studentId}', [FormationSessionController::class, 'unenrollStudent']);
+    // Dans le groupe admin existant
+    Route::apiResource('payments', PaymentController::class);
+    Route::get('students', [UserController::class, 'getStudents']);
+
+    Route::post('formations/{formation}/enroll', [FormationController::class, 'enrollStudent']);
+    Route::delete('formations/{formation}/unenroll/{studentId}', [FormationController::class, 'unenrollStudent']);
+
+    Route::get('formations/{formation}/students', [FormationController::class, 'getEnrolledStudents']);
+
+    // Routes pour les quiz
+    Route::prefix('quiz')->group(function () {
+        Route::post('configurations', [QuizController::class, 'storeConfiguration']);
+        Route::get('configurations', [QuizController::class, 'getAllConfigurations']);
+        Route::get('configurations/{id}', [QuizController::class, 'getConfiguration']);
+        Route::put('configurations/{id}', [QuizController::class, 'updateConfiguration']);  // Nouvelle route
+        Route::delete('configurations/{id}', [QuizController::class, 'deleteConfiguration']);  // Nouvelle route
+
+        Route::post('questions', [QuizController::class, 'storeQuestion']);
+        Route::get('questions', [QuizController::class, 'getAllQuestions']);
+        Route::get('questions/{id}', [QuizController::class, 'getQuestion']);
+        Route::put('questions/{id}', [QuizController::class, 'updateQuestion']);  // Nouvelle route
+        Route::delete('questions/{id}', [QuizController::class, 'deleteQuestion']);  // Nouvelle route
+    });
 });

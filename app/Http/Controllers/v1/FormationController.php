@@ -8,6 +8,7 @@ use App\Http\Requests\v1\Formation\UpdateFormationRequest;
 use App\Http\Services\V1\FormationService;
 use App\Models\Formation;
 use App\Trait\ApiResponse;
+use Illuminate\Http\Request;
 
 class FormationController extends Controller
 {
@@ -78,5 +79,55 @@ class FormationController extends Controller
     {
         $formation = $this->formationService->getFormationBySlug($slug);
         return $this->successResponse('Formation retrieved successfully', 'formation', $formation);
+    }
+
+    public function enrollStudent(Request $request, Formation $formation)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:users,id'
+        ]);
+
+        $result = $this->formationService->enrollExistingStudent(
+            $formation->id,
+            $request->student_id
+        );
+
+        if (!$result) {
+            return response()->json([
+                'message' => 'Failed to enroll student'
+            ], 422);
+        }
+
+        return response()->json([
+            'message' => 'Student enrolled successfully'
+        ]);
+    }
+
+    public function unenrollStudent(Formation $formation, string $studentId)
+    {
+        $result = $this->formationService->unenrollStudent(
+            $formation->id,
+            $studentId
+        );
+
+        if (!$result) {
+            return response()->json([
+                'message' => 'Failed to unenroll student'
+            ], 422);
+        }
+
+        return response()->json([
+            'message' => 'Student unenrolled successfully'
+        ]);
+    }
+
+    public function getEnrolledStudents(Formation $formation)
+    {
+        $students = $this->formationService->getEnrolledStudents($formation->id);
+        return $this->successResponse(
+            'Enrolled students retrieved successfully',
+            'students',
+            $students
+        );
     }
 }

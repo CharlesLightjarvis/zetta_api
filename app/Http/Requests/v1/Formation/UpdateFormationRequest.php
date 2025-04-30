@@ -49,16 +49,18 @@ class UpdateFormationRequest extends FormRequest
                 'after_or_equal:today',
                 function ($attribute, $value, $fail) {
                     $formationId = $this->route('formation');
-                    $sessionId = $this->input(explode('.', $attribute)[1] . '.id');
+                    $sessionIndex = explode('.', $attribute)[1];
+                    $sessionId = $this->input("sessions.{$sessionIndex}.id"); // Récupère l'ID de la session si elle existe
 
-                    $exists = FormationSession::where('formation_id', $formationId)
-                        ->where('start_date', $value)
-                        ->when($sessionId, function ($query) use ($sessionId) {
-                            return $query->where('id', '!=', $sessionId);
-                        })
-                        ->exists();
+                    $query = FormationSession::where('formation_id', $formationId)
+                        ->where('start_date', $value);
 
-                    if ($exists) {
+                    // Si nous modifions une session existante, excluons-la de la vérification
+                    if ($sessionId) {
+                        $query->where('id', '!=', $sessionId);
+                    }
+
+                    if ($query->exists()) {
                         $fail('A session already exists for this formation on this date.');
                     }
                 }
