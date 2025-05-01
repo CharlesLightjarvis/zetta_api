@@ -101,4 +101,60 @@ class AttendanceService
                 ->get()
         );
     }
+
+    // Mettre à jour une présence
+    public function updateAttendance(string $id, array $data)
+    {
+        try {
+            DB::beginTransaction();
+
+            $attendance = Attendance::findOrFail($id);
+
+            Log::info('Updating attendance', [
+                'id' => $id,
+                'old_status' => $attendance->status,
+                'new_status' => $data['status'] ?? $attendance->status
+            ]);
+
+            $attendance->update([
+                'status' => $data['status'] ?? $attendance->status,
+                'notes' => $data['notes'] ?? $attendance->notes,
+            ]);
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('updateAttendance failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $data
+            ]);
+            return false;
+        }
+    }
+
+    // Supprimer une présence
+    public function deleteAttendance(string $id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $attendance = Attendance::findOrFail($id);
+            Log::info('Deleting attendance', ['id' => $id]);
+
+            $attendance->delete();
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('deleteAttendance failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'id' => $id
+            ]);
+            return false;
+        }
+    }
 }

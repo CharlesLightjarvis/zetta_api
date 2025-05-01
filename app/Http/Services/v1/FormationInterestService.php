@@ -5,6 +5,7 @@ namespace App\Http\Services\V1;
 use App\Enums\InterestStatusEnum;
 use App\Events\NewFormationInterest;
 use App\Http\Resources\v1\FormationInterestResource;
+use App\Mail\InterestReceived;
 use App\Models\FormationInterest;
 use App\Models\FormationSession;
 use App\Models\User;
@@ -47,6 +48,7 @@ class FormationInterestService
 
             // Broadcast the event
             broadcast(new NewFormationInterest($interest))->toOthers();
+            Mail::to($interest->email)->send(new InterestReceived($interest));
             Log::info('Event broadcasted');
 
             DB::commit();

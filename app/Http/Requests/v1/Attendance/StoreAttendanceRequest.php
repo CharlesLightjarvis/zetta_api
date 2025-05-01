@@ -36,7 +36,12 @@ class StoreAttendanceRequest extends FormRequest
             ],
             'attendances.*.status' => 'required|in:present,absent',
             'attendances.*.notes' => 'nullable|string|max:1000',
-            'date' => 'required|date|before_or_equal:today',
+            // 'date' => 'required|date|before_or_equal:today',
+            'date' => [
+                'required',
+                'date',
+                'before_or_equal:' . now()->addDay()->format('Y-m-d'), // Ajoute un jour pour tenir compte du décalage
+            ],
         ];
     }
 }

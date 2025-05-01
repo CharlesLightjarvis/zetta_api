@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\v1\AdminController;
 use App\Http\Controllers\v1\QuizController;
 use App\Http\Controllers\v1\CertificationController;
 use App\Http\Controllers\v1\FormationController;
@@ -38,6 +39,8 @@ Route::prefix('admin')->group(function () {
 
     Route::get('formations/{formation}/students', [FormationController::class, 'getEnrolledStudents']);
 
+    Route::get('statistics', [AdminController::class, 'getStatistics']);
+
     // Routes pour les quiz
     Route::prefix('quiz')->group(function () {
         Route::post('configurations', [QuizController::class, 'storeConfiguration']);
@@ -51,5 +54,7 @@ Route::prefix('admin')->group(function () {
         Route::get('questions/{id}', [QuizController::class, 'getQuestion']);
         Route::put('questions/{id}', [QuizController::class, 'updateQuestion']);  // Nouvelle route
         Route::delete('questions/{id}', [QuizController::class, 'deleteQuestion']);  // Nouvelle route
+
+
     });
 });
