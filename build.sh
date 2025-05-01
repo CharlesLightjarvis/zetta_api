@@ -8,11 +8,11 @@ echo "🚀 Déploiement en cours..."
 # Aller dans le dossier de l'application
 cd /var/www/zetta_api
 
-# Mettre à jour le dépôt Git
-echo "📥 Mise à jour du dépôt..."
-# Ajouter tous les fichiers non trackés au dépôt
-git add .
-git commit -m "Auto-commit des fichiers non trackés avant déploiement" || true
+# Forcer la remise à zéro des fichiers locaux avant de pull
+echo "📥 Réinitialisation du dépôt local..."
+git reset --hard HEAD
+git clean -fd
+echo "📥 Mise à jour du dépôt depuis GitHub..."
 git pull origin main
 
 # Installer les dépendances Composer
