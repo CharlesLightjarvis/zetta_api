@@ -10,6 +10,9 @@ cd /var/www/zetta_api
 
 # Mettre à jour le dépôt Git
 echo "📥 Mise à jour du dépôt..."
+# Ajouter tous les fichiers non trackés au dépôt
+git add .
+git commit -m "Auto-commit des fichiers non trackés avant déploiement" || true
 git pull origin main
 
 # Installer les dépendances Composer
