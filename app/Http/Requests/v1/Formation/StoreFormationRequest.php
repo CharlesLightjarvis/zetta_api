@@ -69,6 +69,7 @@ class StoreFormationRequest extends FormRequest
                 }
             ],
             'sessions.*.capacity' => 'required|integer|min:1',
+            'discount_price' => 'required|integer|min:0|gte:price',
         ];
     }
 }

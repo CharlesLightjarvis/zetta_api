@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Payment extends Model
 {
@@ -26,12 +27,12 @@ class Payment extends Model
         'remaining_amount' => 'decimal:2'
     ];
 
-    public function student()
+    public function student(): BelongsTo
     {
         return $this->belongsTo(User::class, 'student_id');
     }
 
-    public function formation()
+    public function formation(): BelongsTo
     {
         return $this->belongsTo(Formation::class);
     }

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->enum('level', LevelEnum::values())->default(LevelEnum::BEGINNER->value);
             $table->integer('duration')->unsigned(); // en heures
             $table->integer('price');
+            $table->integer('discount_price');
             $table->foreignUuid('category_id')->constrained('categories')->restrictOnDelete();
             $table->json('prerequisites')->nullable();
             $table->json('objectives')->nullable();

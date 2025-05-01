@@ -38,6 +38,7 @@ class FormationResource extends JsonResource
             "level" => $this->resource->level,
             "duration" => $this->resource->duration,
             "price" => $this->resource->price,
+            "discount_price" => $this->resource->discount_price,
             "category" =>  new CategoryResource($this->resource->category),
             "link" => $this->resource->link,
             "prerequisites" => $this->resource->prerequisites,
@@ -84,7 +85,8 @@ class FormationResource extends JsonResource
                     /** @var Lesson $lesson */
                     return [
                         'id' => $lesson->id,
-                        'name' => $lesson->name
+                        'name' => $lesson->name,
+                        'description' => $lesson->description
                     ];
                 })
             ];

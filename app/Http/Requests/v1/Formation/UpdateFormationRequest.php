@@ -77,6 +77,7 @@ class UpdateFormationRequest extends FormRequest
                 }
             ],
             'sessions.*.capacity' => 'required|integer|min:1',
+            'discount_price' => 'sometimes|integer|min:0|gte:price',
         ];
     }
 }

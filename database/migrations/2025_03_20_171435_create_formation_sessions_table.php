@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\CourseTypeEnum;
+use App\Enums\SessionStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,8 +20,8 @@ return new class extends Migration
             $table->enum('course_type', CourseTypeEnum::values())->default(CourseTypeEnum::DAY->value);
             $table->date('start_date');
             $table->date('end_date');
-            // $table->enum('status', ['active', 'completed', 'cancelled'])->default('active');
             $table->integer('capacity')->unsigned();
+            $table->enum('status', SessionStatusEnum::values())->default(SessionStatusEnum::ACTIVE->value);
             $table->integer('enrolled_students')->unsigned()->default(0);
             $table->timestamps();
         });

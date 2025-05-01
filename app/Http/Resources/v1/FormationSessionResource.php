@@ -27,6 +27,7 @@ class FormationSessionResource extends JsonResource
             "start_date" => $this->resource->start_date->format('Y-m-d'),
             "end_date" => $this->resource->end_date->format('Y-m-d'),
             "capacity" => $this->resource->capacity,
+            "status" => $this->resource->status,
             "enrolled_students" => $this->resource->enrolled_students,
             "formation" => $this->whenLoaded('formation', fn(): array => $this->getFormationData()),
             "teacher" => $this->whenLoaded('teacher', fn(): UserResource => new UserResource($this->resource->teacher)),

@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
+/**
+ * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\Question> $questions
+ * @property \App\Models\QuizConfiguration|null $quizConfiguration
+ */
 class Certification extends Model
 {
     use HasUuids;
@@ -59,12 +64,12 @@ class Certification extends Model
         ];
     }
 
-    public function quizConfiguration()
+    public function quizConfiguration(): MorphOne
     {
         return $this->morphOne(QuizConfiguration::class, 'configurable');
     }
 
-    public function questions()
+    public function questions(): MorphMany
     {
         return $this->morphMany(Question::class, 'questionable');
     }

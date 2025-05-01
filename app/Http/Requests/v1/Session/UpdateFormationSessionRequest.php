@@ -39,6 +39,7 @@ class UpdateFormationSessionRequest extends FormRequest
             ],
             'end_date' => 'sometimes|required|date|after:start_date',
             'capacity' => 'sometimes|required|integer|min:1',
+            'status' => 'sometimes|nullable|string|in:active,cancelled,completed',
         ];
     }
 }

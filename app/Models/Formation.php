@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
 class Formation extends Model
 {
     use HasUuids;
@@ -20,6 +21,7 @@ class Formation extends Model
         'level',
         'duration',
         'price',
+        'discount_price',
         'category_id',
         'prerequisites',
         'objectives',
@@ -34,6 +36,7 @@ class Formation extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
 
     public function students(): BelongsToMany
     {
@@ -50,12 +53,12 @@ class Formation extends Model
         return $this->belongsToMany(Module::class, 'formation_modules', 'formation_id', 'module_id')->withTimestamps();
     }
 
-    public function sessions()
+    public function sessions(): HasMany
     {
         return $this->hasMany(FormationSession::class);
     }
 
-    public function interests()
+    public function interests(): HasMany
     {
         return $this->hasMany(FormationInterest::class);
     }

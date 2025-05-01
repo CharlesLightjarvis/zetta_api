@@ -21,6 +21,7 @@ class FormationSession extends Model
         'start_date',
         'end_date',
         'capacity',
+        'status',
         'enrolled_students',
     ];
 

@@ -57,6 +57,7 @@ class FormationSeeder extends Seeder
                 'description' => $faker->paragraph,
                 'duration' => $faker->numberBetween(4, 16),
                 'price' => $faker->numberBetween(500, 3000),
+                'discount_price' => $faker->numberBetween(500, 3000),
                 'level' => $faker->randomElement(['beginner', 'intermediate', 'advanced']),
                 'category_id' => $categories->random()->id,
                 'prerequisites' => $prerequisites, // Prérequis aléatoires

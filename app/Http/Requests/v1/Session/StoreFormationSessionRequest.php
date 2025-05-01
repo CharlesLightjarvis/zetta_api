@@ -39,6 +39,7 @@ class StoreFormationSessionRequest extends FormRequest
             ],
             'end_date' => 'required|date|after:start_date',
             'capacity' => 'required|integer|min:1',
+            'status' => 'nullable|string|in:active,cancelled,completed',
         ];
     }
 }
