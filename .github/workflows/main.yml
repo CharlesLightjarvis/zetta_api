@@ -44,6 +44,10 @@ jobs:
           echo "DB_USERNAME=root" >> .env.testing
           echo "DB_PASSWORD=password" >> .env.testing
 
+      # Ajoutez cette étape avant d'exécuter les seeders
+      - name: Clear Composer cache
+        run: composer dump-autoload
+
       - name: Run migrations
         run: php artisan migrate --seed --env=testing --force
 
