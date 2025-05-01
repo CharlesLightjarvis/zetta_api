@@ -9,9 +9,9 @@ echo "🚀 Déploiement en cours..."
 cd /var/www/zetta_api
 
 # Forcer la remise à zéro des fichiers locaux avant de pull
-echo "📥 Réinitialisation du dépôt local..."
-git reset --hard HEAD
-git clean -fd
+# echo "📥 Réinitialisation du dépôt local..."
+# git reset --hard HEAD
+# git clean -fd
 echo "📥 Mise à jour du dépôt depuis GitHub..."
 git pull origin main
 
