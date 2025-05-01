@@ -96,4 +96,6 @@ class QuizSeeder extends Seeder
             ]);
         }
     }
+
+    //changes
 }
