@@ -18,11 +18,13 @@ echo "📦 Installation des dépendances PHP..."
 composer install --no-dev --optimize-autoloader
 
 # Installer les dépendances npm (si nécessaire pour le frontend)
-echo "📦 Installation des dépendances npm..."
-npm install && npm run build
+if [ -f "package.json" ]; then
+    echo "📦 Installation des dépendances npm..."
+    npm install && npm run build
+fi
 
 # Mettre à jour l'environnement
-echo "⚙️  Configuration de l'environnement..."
+echo "⚙️ Configuration de l'environnement..."
 
 # Exécuter les migrations (si besoin)
 echo "📊 Exécution des migrations..."
