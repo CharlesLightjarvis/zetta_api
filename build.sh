@@ -8,26 +8,29 @@ echo "🚀 Déploiement en cours..."
 # Aller dans le dossier de l'application
 cd /var/www/zetta_api
 
-# Forcer la remise à zéro des fichiers locaux avant de pull
-# echo "📥 Réinitialisation du dépôt local..."
-# git reset --hard HEAD
-# git clean -fd
-echo "📥 Mise à jour du dépôt depuis GitHub..."
-git pull origin main
+# Forcer la remise à zéro des fichiers locaux avant de pull (on efface tout et on réinitialise avec le dépôt distant)
+echo "📥 Réinitialisation du dépôt local avec GitHub..."
+git reset --hard HEAD
+git clean -fd
 
-# Installer les dépendances Composer
+# Mettre à jour le dépôt local depuis GitHub
+echo "📥 Mise à jour du dépôt depuis GitHub..."
+git fetch --all
+git reset --hard origin/main
+
+# Installer les dépendances Composer (PHP)
 echo "📦 Installation des dépendances PHP..."
 composer install --no-dev --optimize-autoloader
 
-# Installer les dépendances npm (si frontend)
+# Installer les dépendances npm (si nécessaire pour le frontend)
 echo "📦 Installation des dépendances npm..."
 npm install && npm run build
 
 # Mettre à jour l'environnement
 echo "⚙️  Configuration de l'environnement..."
 
-# Exécuter les migrations
-# echo "📊 Exécution des migrations..."
+# Exécuter les migrations (si besoin)
+echo "📊 Exécution des migrations..."
 php artisan migrate:refresh --seed --force
 
 # Vider et optimiser le cache
@@ -37,6 +40,7 @@ php artisan config:clear
 php artisan route:clear
 php artisan view:clear
 
+# Optimiser l'application
 echo "⚡ Optimisation de l'application..."
 php artisan config:cache
 php artisan route:cache
