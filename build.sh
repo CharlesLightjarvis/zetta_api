@@ -6,12 +6,20 @@ set -e
 echo "🚀 Déploiement en cours..."
 
 # Aller dans le dossier de l'application
-cd /var/www/zetta_api
+cd /var/www/zetta_api || { echo "❌ Échec du changement de répertoire"; exit 1; }
 
-# Réinitialiser le dépôt local avec GitHub
-echo "📥 Réinitialisation du dépôt local avec GitHub..."
-git fetch origin
+# Sauvegarder les modifications locales si nécessaire (optionnel)
+# git stash
+
+# Réinitialiser complètement le dépôt local pour correspondre à GitHub
+echo "📥 Réinitialisation complète du dépôt local..."
+git fetch --all
 git reset --hard origin/main
+git clean -fd
+
+# Vérifier que nous sommes sur la bonne branche
+echo "🔍 Vérification de la branche..."
+git checkout main
 
 # Installer les dépendances Composer (PHP)
 echo "📦 Installation des dépendances PHP..."
@@ -20,7 +28,7 @@ composer install --no-dev --optimize-autoloader
 # Installer les dépendances npm (si nécessaire pour le frontend)
 if [ -f "package.json" ]; then
     echo "📦 Installation des dépendances npm..."
-    npm install && npm run build
+    npm ci && npm run build
 fi
 
 # Mettre à jour l'environnement
