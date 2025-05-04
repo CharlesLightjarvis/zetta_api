@@ -8,14 +8,9 @@ echo "🚀 Déploiement en cours..."
 # Aller dans le dossier de l'application
 cd /var/www/zetta_api
 
-# Forcer la remise à zéro des fichiers locaux avant de pull (on efface tout et on réinitialise avec le dépôt distant)
+# Réinitialiser le dépôt local avec GitHub
 echo "📥 Réinitialisation du dépôt local avec GitHub..."
-git reset --hard HEAD
-git clean -fd
-
-# Mettre à jour le dépôt local depuis GitHub
-echo "📥 Mise à jour du dépôt depuis GitHub..."
-git fetch --all
+git fetch origin
 git reset --hard origin/main
 
 # Installer les dépendances Composer (PHP)
