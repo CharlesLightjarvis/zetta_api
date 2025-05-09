@@ -10,6 +10,7 @@ use App\Http\Requests\v1\QuizConfiguration\UpdateQuizConfigurationRequest;
 use App\Http\Resources\v1\QuizConfigurationResource;
 use App\Http\Resources\v1\QuestionResource;
 use App\Http\Services\V1\QuizService;
+use App\Models\Certification;
 
 class QuizController extends Controller
 {
@@ -93,4 +94,59 @@ class QuizController extends Controller
         }
         return response()->json(['message' => 'Question non trouvée'], 404);
     }
+
+    /**
+ * Récupère les modules associés à une certification via sa formation
+ *
+ * @param string $certificationId
+ * @return \Illuminate\Http\JsonResponse
+ */
+public function getCertificationModules($certificationId)
+{
+    try {
+        $certification = Certification::findOrFail($certificationId);
+        $formation = $certification->formation;
+        $modules = $formation->modules;
+        
+        return response()->json($modules);
+    } catch (\Exception $e) {
+        return response()->json(['message' => $e->getMessage()], 400);
+    }
+}
+
+     /**
+ * Génère un quiz basé sur une configuration spécifique
+ * 
+ * @param int $configId ID de la configuration du quiz
+ * @param string $type Type de quiz (normal ou certification)
+ * @return \Illuminate\Http\JsonResponse
+ */
+public function generateQuiz($configId, $type = 'normal')
+{
+    try {
+        // Récupérer la configuration du quiz
+        $config = $this->quizService->getQuizConfiguration($configId);
+        
+        // Vérifier que $config est bien un objet QuizConfiguration
+        if (!$config instanceof \App\Models\QuizConfiguration) {
+            throw new \Exception('Configuration de quiz introuvable');
+        }
+        
+        // Générer le quiz
+        $questions = $this->quizService->generateQuiz($config, $type);
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'config' => new QuizConfigurationResource($config),
+                'questions' => QuestionResource::collection($questions)
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 400);
+    }
+}
 }

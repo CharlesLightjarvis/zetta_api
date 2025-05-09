@@ -16,7 +16,7 @@ class StoreQuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'questionable_type' => 'required|in:lesson,certification',
+            'questionable_type' => 'required|in:lesson,module',
             'questionable_id' => 'required|uuid',
             'question' => 'required|string',
             'answers' => 'required|array',
@@ -24,7 +24,9 @@ class StoreQuestionRequest extends FormRequest
             'answers.*.text' => 'required|string',
             'answers.*.correct' => 'required|boolean',
             'difficulty' => 'required|string|in:easy,medium,hard',
-            'points' => 'required|integer|min:1'
+            'points' => 'required|integer|min:1',
+            'type' => 'required|string|in:normal,certification' // Ajouter cette ligne
+
         ];
     }
 }

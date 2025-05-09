@@ -21,6 +21,9 @@ class StoreQuizConfigurationRequest extends FormRequest
             'difficulty_distribution.easy' => 'required|integer|min:0|max:100',
             'difficulty_distribution.medium' => 'required|integer|min:0|max:100',
             'difficulty_distribution.hard' => 'required|integer|min:0|max:100',
+            'module_distribution' => 'nullable|array',
+            'module_distribution.*' => 'integer|min:0|max:100',
+            'question_type' => 'required|string|in:normal,certification',
             'passing_score' => 'required|integer|min:0|max:100',
             'time_limit' => 'required|integer|min:1',
         ];

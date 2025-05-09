@@ -1,54 +1,50 @@
 #!/bin/bash
 
-# Activer le mode strict
+# Activer le mode strict pour voir les erreurs
 set -e
 
 echo "🚀 Déploiement en cours..."
 
 # Aller dans le dossier de l'application
-DEPLOY_DIR="/var/www/zetta_api"
-cd "$DEPLOY_DIR" || { echo "❌ Échec du changement de répertoire vers $DEPLOY_DIR"; exit 1; }
+cd /var/www/zetta_api
 
-# 1. Supprimer complètement le contenu sauf .env et storage
-echo "🧹 Nettoyage du répertoire (sauvegarde .env et storage)..."
-mkdir -p /tmp/zetta_backup
-[ -f .env ] && cp .env /tmp/zetta_backup/
-[ -d storage ] && cp -r storage /tmp/zetta_backup/
+# Forcer la remise à zéro des fichiers locaux avant de pull
+# echo "📥 Réinitialisation du dépôt local..."
+# git reset --hard HEAD
+# git clean -fd
+echo "📥 Mise à jour du dépôt depuis GitHub..."
+git pull origin main
 
-# 2. Cloner à nouveau le dépôt
-echo "📥 Clonage du dépôt..."
-rm -rf "$DEPLOY_DIR"/* "$DEPLOY_DIR"/.git
-git clone https://github.com/CharlesLightjarvis/zetta_api.git "$DEPLOY_DIR"
-
-# 3. Restaurer .env et storage
-echo "🔄 Restauration des fichiers critiques..."
-[ -f /tmp/zetta_backup/.env ] && cp /tmp/zetta_backup/.env "$DEPLOY_DIR"/
-[ -d /tmp/zetta_backup/storage ] && cp -r /tmp/zetta_backup/storage "$DEPLOY_DIR"/
-
-# 4. Aller dans le dossier
-cd "$DEPLOY_DIR" || exit 1
-
-# Installation des dépendances
+# Installer les dépendances Composer
 echo "📦 Installation des dépendances PHP..."
 composer install --no-dev --optimize-autoloader
 
-if [ -f "package.json" ]; then
-    echo "📦 Installation des dépendances Node..."
-    npm ci --silent && npm run build --silent
-fi
+# Installer les dépendances npm (si frontend)
+echo "📦 Installation des dépendances npm..."
+npm install && npm run build
 
-# Migrations et optimisation
-echo "⚙️ Configuration de l'application..."
-php artisan migrate --force
-php artisan optimize:clear
-php artisan optimize
+# Mettre à jour l'environnement
+echo "⚙️  Configuration de l'environnement..."
 
-# Redémarrage des services
-echo "🔄 Redémarrage des services..."
+# Exécuter les migrations
+# echo "📊 Exécution des migrations..."
+php artisan migrate:refresh --seed --force
+
+# Vider et optimiser le cache
+echo "🧹 Nettoyage du cache..."
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+
+echo "⚡ Optimisation de l'application..."
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Redémarrer les services
+echo "🔄 Redémarrage de PHP-FPM et Nginx..."
 systemctl restart php8.3-fpm
 systemctl restart nginx
 
-# Nettoyage
-# rm -rf /tmp/zetta_backup
-
-echo "✅ Déploiement terminé avec succès! 🎉"
+echo "✅ Déploiement terminé avec succès ! 🎉"

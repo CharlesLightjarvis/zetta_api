@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('progress_tracking', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained();
+            $table->json('question_ids')->nullable();
             $table->nullableUuidMorphs('trackable');
             $table->json('answer_details');
             $table->integer('score');

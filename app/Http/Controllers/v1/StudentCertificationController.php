@@ -42,12 +42,19 @@ class StudentCertificationController extends Controller
 
     public function submitQuiz(Request $request, $certificationId)
     {
+        // On valide la présence de answers et question_ids
+        $validated = $request->validate([
+            'answers' => 'required|array',
+            'question_ids' => 'required|array'
+        ]);
+    
         $result = $this->studentCertificationService->submitQuiz(
             $this->authStudentId(),
             $certificationId,
-            $request->input('answers')  // Correction ici
+            $validated['answers'],
+            $validated['question_ids']
         );
-
+    
         return $this->successResponse(
             $result['passed'] ? 'Quiz completed successfully!' : 'Quiz completed',
             'quiz_result',
@@ -56,19 +63,19 @@ class StudentCertificationController extends Controller
     }
 
     public function getQuizResult($certificationId, $progressTrackingId)
-    {
-        $result = $this->studentCertificationService->getQuizResult(
-            $this->authStudentId(),
-            $certificationId,
-            $progressTrackingId
-        );
+{
+    $result = $this->studentCertificationService->getQuizResult(
+        $this->authStudentId(),
+        $certificationId,
+        $progressTrackingId
+    );
 
-        return $this->successResponse(
-            'Quiz result retrieved successfully',
-            'quiz_result',
-            $result
-        );
-    }
+    return $this->successResponse(
+        'Quiz result retrieved successfully',
+        'quiz_result',
+        $result
+    );
+}
 
     public function authStudentId()
     {

@@ -22,6 +22,8 @@ class CertificationQuizResource extends JsonResource
         return [
             'certification_id' => $this->resource['certification']->id,
             'certification_name' => $this->resource['certification']->name,
+            'question_ids' => $this['question_ids'], // <-- AJOUT ICI
+
             'time_limit' => $this->resource['time_limit'],
             'questions' => $this->resource['questions']->map(function ($question) {
                 return [

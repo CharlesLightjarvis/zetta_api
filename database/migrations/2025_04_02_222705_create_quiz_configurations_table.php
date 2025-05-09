@@ -18,6 +18,8 @@ return new class extends Migration
             $table->json('difficulty_distribution'); // {"easy": 40, "medium": 40, "hard": 20}
             $table->integer('passing_score')->default(70);
             $table->integer('time_limit')->nullable(); // en minutes
+            $table->json('module_distribution')->nullable(); // {"module_id1": 10, "module_id2": 30, ...}
+
             $table->timestamps();
         });
     }

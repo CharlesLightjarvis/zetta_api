@@ -16,6 +16,8 @@ Route::prefix('student')->group(function () {
     Route::get('formations', [StudentFormationController::class, 'index']);
     Route::get('formations/{formationId}', [StudentFormationController::class, 'show']);
 
+    
+
     Route::post('certifications/{certificationId}/quiz/submit', [StudentCertificationController::class, 'submitQuiz']);
     Route::get('certifications/{certificationId}/quiz-results/{progressTrackingId}', [StudentCertificationController::class, 'getQuizResult']);
 

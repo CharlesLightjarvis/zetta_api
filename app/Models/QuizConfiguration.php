@@ -15,12 +15,14 @@ class QuizConfiguration extends Model
         'configurable_id',
         'total_questions',
         'difficulty_distribution',
+        'module_distribution',
         'passing_score',
         'time_limit'
     ];
 
     protected $casts = [
         'difficulty_distribution' => 'array',
+        'module_distribution' => 'array',
     ];
 
     public function configurable(): MorphTo

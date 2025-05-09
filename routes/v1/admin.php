@@ -55,6 +55,10 @@ Route::prefix('admin')->group(function () {
         Route::put('questions/{id}', [QuizController::class, 'updateQuestion']);  // Nouvelle route
         Route::delete('questions/{id}', [QuizController::class, 'deleteQuestion']);  // Nouvelle route
 
+        Route::get('generate-quiz/{configId}/{type?}', [QuizController::class, 'generateQuiz']);
 
     });
+
+    Route::get('certifications/{certificationId}/modules', [QuizController::class, 'getCertificationModules']);
 });
+

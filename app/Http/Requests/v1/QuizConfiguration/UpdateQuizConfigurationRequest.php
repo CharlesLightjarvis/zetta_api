@@ -19,6 +19,8 @@ class UpdateQuizConfigurationRequest extends FormRequest
             'difficulty_distribution.easy' => 'required_with:difficulty_distribution|integer|min:0|max:100',
             'difficulty_distribution.medium' => 'required_with:difficulty_distribution|integer|min:0|max:100',
             'difficulty_distribution.hard' => 'required_with:difficulty_distribution|integer|min:0|max:100',
+            'module_distribution' => 'sometimes|nullable|array',
+            'module_distribution.*' => 'integer|min:0|max:100',
             'passing_score' => 'sometimes|required|integer|min:0|max:100',
             'time_limit' => 'sometimes|required|integer|min:1',
         ];

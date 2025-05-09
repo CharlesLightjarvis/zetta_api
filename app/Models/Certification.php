@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
+ * @property string $id
+ * @property \App\Models\Formation $formation
  * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\Question> $questions
  * @property \App\Models\QuizConfiguration|null $quizConfiguration
  */
@@ -69,8 +71,8 @@ class Certification extends Model
         return $this->morphOne(QuizConfiguration::class, 'configurable');
     }
 
-    public function questions(): MorphMany
-    {
-        return $this->morphMany(Question::class, 'questionable');
-    }
+    // public function questions(): MorphMany
+    // {
+    //     return $this->morphMany(Question::class, 'questionable');
+    // }
 }

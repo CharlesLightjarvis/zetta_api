@@ -15,6 +15,7 @@ class Question extends Model
         'questionable_id',
         'question',
         'answers',
+        'type',
         'difficulty',
         'points',
     ];

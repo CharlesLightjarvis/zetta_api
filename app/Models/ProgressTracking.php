@@ -21,13 +21,15 @@ class ProgressTracking extends Model
         'score',
         'passed',
         'attempt_number',
-        'completed_at'
+        'completed_at',
+        'question_ids',
     ];
 
     protected $casts = [
         'answer_details' => 'array',
         'passed' => 'boolean',
         'completed_at' => 'datetime',
+        'question_ids' => 'array',
     ];
 
     public function user(): BelongsTo
