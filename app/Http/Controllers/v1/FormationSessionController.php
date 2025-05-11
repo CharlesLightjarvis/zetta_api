@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\v1\Session\StoreFormationSessionRequest;
 use App\Http\Requests\v1\Session\UpdateFormationSessionRequest;
 use App\Http\Services\V1\FormationSessionService;
+use App\Models\FormationSession;
 use App\Trait\ApiResponse;
 
 class FormationSessionController extends Controller
@@ -87,6 +88,7 @@ class FormationSessionController extends Controller
         }
         return $this->errorResponse('Failed to enroll student', 400);
     }
+
 
     public function unenrollStudent($sessionId, $studentId)
     {

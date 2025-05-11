@@ -101,6 +101,17 @@ class QuizService
                 'points' => $data['points']
             ]);
 
+            // Debug - Afficher les informations dans le log
+            Log::info('Création de question', [
+                'questionable_type' => $modelClass, // Classe complète comme "App\Models\Module"
+                'questionable_id' => $questionable->id,
+                'question' => $data['question'],
+                'answers' => $data['answers'],
+                'difficulty' => $data['difficulty'],
+                'type' => $data['type'],
+                'points' => $data['points']
+            ]);
+
             DB::commit();
             return $question;
         } catch (\Exception $e) {
@@ -176,6 +187,35 @@ class QuizService
             DB::beginTransaction();
 
             $question = Question::findOrFail($id);
+            
+            // Traiter le questionable_type si présent
+            if (isset($data['questionable_type'])) {
+                // Déterminer le type de modèle
+                $modelClass = match ($data['questionable_type']) {
+                    'lesson' => Lesson::class,
+                    'module' => Module::class,
+                    default => throw new \InvalidArgumentException('Invalid questionable type: ' . $data['questionable_type'])
+                };
+                
+                // Vérifier si l'entité existe
+                if (isset($data['questionable_id'])) {
+                    $questionable = $modelClass::findOrFail($data['questionable_id']);
+                    $data['questionable_id'] = $questionable->id;
+                }
+                
+                // Remplacer le type simplifié par la classe complète
+                $data['questionable_type'] = $modelClass;
+            }
+            
+            // S'assurer que le type est correctement défini
+            if (isset($data['type']) && in_array($data['type'], ['normal', 'certification'])) {
+                // Le type est déjà correct, pas besoin de le modifier
+                Log::info('Mise à jour du type de question', [
+                    'question_id' => $id,
+                    'nouveau_type' => $data['type']
+                ]);
+            }
+
             $question->update($data);
 
             DB::commit();

@@ -15,7 +15,7 @@ class StorePaymentRequest extends FormRequest
     {
         return [
             'student_id' => 'required|uuid|exists:users,id',
-            'formation_id' => 'required|uuid|exists:formations,id',
+            'session_id' => 'required|uuid|exists:formation_sessions,id',
             'amount' => 'required|numeric|min:0',
             'payment_method' => 'nullable|string|max:255',
             'notes' => 'nullable|string',

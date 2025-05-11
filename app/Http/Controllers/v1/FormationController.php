@@ -81,45 +81,45 @@ class FormationController extends Controller
         return $this->successResponse('Formation retrieved successfully', 'formation', $formation);
     }
 
-    public function enrollStudent(Request $request, Formation $formation)
-    {
-        $request->validate([
-            'student_id' => 'required|exists:users,id'
-        ]);
+    // public function enrollStudent(Request $request, Formation $formation)
+    // {
+    //     $request->validate([
+    //         'student_id' => 'required|exists:users,id'
+    //     ]);
 
-        $result = $this->formationService->enrollExistingStudent(
-            $formation->id,
-            $request->student_id
-        );
+    //     $result = $this->formationService->enrollExistingStudent(
+    //         $formation->id,
+    //         $request->student_id
+    //     );
 
-        if (!$result) {
-            return response()->json([
-                'message' => 'Failed to enroll student'
-            ], 422);
-        }
+    //     if (!$result) {
+    //         return response()->json([
+    //             'message' => 'Failed to enroll student'
+    //         ], 422);
+    //     }
 
-        return response()->json([
-            'message' => 'Student enrolled successfully'
-        ]);
-    }
+    //     return response()->json([
+    //         'message' => 'Student enrolled successfully'
+    //     ]);
+    // }
 
-    public function unenrollStudent(Formation $formation, string $studentId)
-    {
-        $result = $this->formationService->unenrollStudent(
-            $formation->id,
-            $studentId
-        );
+    // public function unenrollStudent(Formation $formation, string $studentId)
+    // {
+    //     $result = $this->formationService->unenrollStudent(
+    //         $formation->id,
+    //         $studentId
+    //     );
 
-        if (!$result) {
-            return response()->json([
-                'message' => 'Failed to unenroll student'
-            ], 422);
-        }
+    //     if (!$result) {
+    //         return response()->json([
+    //             'message' => 'Failed to unenroll student'
+    //         ], 422);
+    //     }
 
-        return response()->json([
-            'message' => 'Student unenrolled successfully'
-        ]);
-    }
+    //     return response()->json([
+    //         'message' => 'Student unenrolled successfully'
+    //     ]);
+    // }
 
     public function getEnrolledStudents(Formation $formation)
     {

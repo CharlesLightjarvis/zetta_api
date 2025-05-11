@@ -12,13 +12,13 @@ class Payment extends Model
 
     protected $fillable = [
         'student_id',
-        'formation_id',
+        'session_id',
         'amount',
         'remaining_amount',
         'payment_method',
         'status',
         'notes',
-        'payment_date'
+        'payment_date'  
     ];
 
     protected $casts = [
@@ -32,8 +32,14 @@ class Payment extends Model
         return $this->belongsTo(User::class, 'student_id');
     }
 
-    public function formation(): BelongsTo
+    public function session(): BelongsTo
     {
-        return $this->belongsTo(Formation::class);
+        return $this->belongsTo(FormationSession::class);
+    }
+
+    // Méthode pour accéder à la formation via la session
+    public function formation()
+    {
+        return $this->session->formation;
     }
 }

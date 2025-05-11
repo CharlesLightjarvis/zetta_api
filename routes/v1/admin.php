@@ -28,6 +28,8 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('interests', FormationInterestController::class);
     Route::post('interests/{id}/approve', [FormationInterestController::class, 'approve']);
     Route::get('sessions/{sessionId}/students', [FormationSessionController::class, 'getSessionStudents']);
+    Route::get('students/{studentId}/sessions-formations', [UserController::class, 'getStudentSessionsAndFormations']);
+
     Route::post('sessions/{sessionId}/students/{studentId}', [FormationSessionController::class, 'enrollStudent']);
     Route::delete('sessions/{sessionId}/students/{studentId}', [FormationSessionController::class, 'unenrollStudent']);
     // Dans le groupe admin existant

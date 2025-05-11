@@ -31,4 +31,10 @@ class Attendance extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Méthode pour accéder à la formation via la session
+    public function formation()
+    {
+        return $this->session->formation;
+    }
 }

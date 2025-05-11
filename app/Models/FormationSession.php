@@ -55,4 +55,9 @@ class FormationSession extends Model
     {
         return $this->hasMany(Attendance::class);
     }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'session_id');
+    }
 }

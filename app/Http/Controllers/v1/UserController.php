@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\v1\User\StoreUserRequest;
 use App\Http\Requests\v1\User\UpdateUserRequest;
 use App\Http\Services\V1\UserService;
+use App\Models\Formation;
+use App\Models\User;
 use App\Trait\ApiResponse;
 
 class UserController extends Controller
@@ -77,5 +79,24 @@ class UserController extends Controller
     {
         $students = $this->userService->getStudents();
         return $this->successResponse('Students retrieved successfully', 'students', $students);
+    }
+
+    public function getStudentSessionsAndFormations($studentId)
+    {
+        $student = User::findOrFail($studentId);
+        
+        // Récupérer toutes les sessions auxquelles l'étudiant est inscrit
+        $sessions = $student->enrolledSessions()->with(['formation'])->get();
+        
+        // Récupérer toutes les formations auxquelles l'étudiant est inscrit
+        // via les sessions
+        $formationIds = $sessions->pluck('formation_id')->unique();
+        $formations = Formation::whereIn('id', $formationIds)->get();
+        
+        return response()->json([
+            'success' => true,
+            'sessions' => $sessions,
+            'formations' => $formations
+        ]);
     }
 }

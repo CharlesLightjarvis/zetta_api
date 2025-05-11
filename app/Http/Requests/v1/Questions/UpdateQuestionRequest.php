@@ -20,7 +20,10 @@ class UpdateQuestionRequest extends FormRequest
             'answers.*.text' => 'required|string',
             'answers.*.correct' => 'required|boolean',
             'difficulty' => 'sometimes|required|string|in:easy,medium,hard',
-            'points' => 'sometimes|required|integer|min:1'
+            'points' => 'sometimes|required|integer|min:1',
+            'type' => 'sometimes|required|string|in:normal,certification',
+            'questionable_type' => 'sometimes|required|in:lesson,module',
+            'questionable_id' => 'sometimes|required|uuid'
         ];
     }
 }

@@ -25,5 +25,8 @@ Route::prefix('teacher')->group(function () {
 
         // Historique des présences d'un étudiant
         Route::get('sessions/{sessionId}/students/{studentId}', [AttendanceController::class, 'getStudentAttendance']);
+
+        Route::get('my-records', [AttendanceController::class, 'getTeacherAttendances']);
+
     });
 });

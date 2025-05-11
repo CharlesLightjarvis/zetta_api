@@ -185,98 +185,102 @@ class FormationService
         return $formation ? $formation->delete() : false;
     }
 
-    public function enrollExistingStudent(string $formationId, string $studentId): bool
-    {
-        try {
-            DB::beginTransaction();
+    // public function enrollExistingStudent(string $formationId, string $studentId): bool
+    // {
+    //     try {
+    //         DB::beginTransaction();
 
-            // 1. Vérifier si l'étudiant existe et a le rôle étudiant
-            $student = User::findOrFail($studentId);
-            if (!$student->hasRole('student')) {
-                throw new \Exception('User must be a student to enroll');
-            }
+    //         // 1. Vérifier si l'étudiant existe et a le rôle étudiant
+    //         $student = User::findOrFail($studentId);
+    //         if (!$student->hasRole('student')) {
+    //             throw new \Exception('User must be a student to enroll');
+    //         }
 
-            // 2. Vérifier si la formation existe
-            $formation = Formation::findOrFail($formationId);
+    //         // 2. Vérifier si la formation existe
+    //         $formation = Formation::findOrFail($formationId);
 
-            // 3. Vérifier si l'étudiant n'est pas déjà inscrit à la formation
-            if ($formation->students()->where('users.id', $studentId)->exists()) {
-                throw new \Exception('Student already enrolled in this formation');
-            }
+    //         // 3. Vérifier si l'étudiant n'est pas déjà inscrit à la formation
+    //         if ($formation->students()->where('users.id', $studentId)->exists()) {
+    //             throw new \Exception('Student already enrolled in this formation');
+    //         }
 
-            // 4. Inscrire à la formation
-            $formation->students()->attach($studentId);
+    //         // 4. Inscrire à la formation
+    //         $formation->students()->attach($studentId);
 
-            // 5. Inscrire à la première session disponible
-            $session = $formation->sessions()
-                ->where('enrolled_students', '<', DB::raw('capacity'))
-                ->orderBy('start_date')
-                ->first();
+    //         // 5. Inscrire à la première session active disponible
+    //         $session = $formation->sessions()
+    //             ->where('status', 'active')
+    //             ->orderBy('start_date')
+    //             ->first();
 
-            if (!$session) {
-                throw new \Exception('No available session found');
-            }
+    //         if (!$session) {
+    //             // Si aucune session active n'est trouvée, on laisse l'étudiant inscrit à la formation uniquement
+    //             Log::info('No active session found for formation', [
+    //                 'formation_id' => $formationId,
+    //                 'student_id' => $studentId
+    //             ]);
+    //         } else {
+    //             // 6. Vérifier si l'étudiant n'est pas déjà inscrit à la session
+    //             if (!$session->students()->where('users.id', $studentId)->exists()) {
+    //                 $session->students()->attach($studentId);
+    //                 $session->increment('enrolled_students');
+    //             }
+    //         }
 
-            // 6. Vérifier si l'étudiant n'est pas déjà inscrit à la session
-            if (!$session->students()->where('users.id', $studentId)->exists()) {
-                $session->students()->attach($studentId);
-                $session->increment('enrolled_students');
-            }
+    //         DB::commit();
+    //         return true;
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Failed to enroll existing student', [
+    //             'student_id' => $studentId,
+    //             'formation_id' => $formationId,
+    //             'error' => $e->getMessage()
+    //         ]);
+    //         return false;
+    //     }
+    // }
 
-            DB::commit();
-            return true;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to enroll existing student', [
-                'student_id' => $studentId,
-                'formation_id' => $formationId,
-                'error' => $e->getMessage()
-            ]);
-            return false;
-        }
-    }
+    // public function unenrollStudent(string $formationId, string $studentId): bool
+    // {
+    //     try {
+    //         DB::beginTransaction();
 
-    public function unenrollStudent(string $formationId, string $studentId): bool
-    {
-        try {
-            DB::beginTransaction();
+    //         // 1. Vérifier si la formation existe
+    //         $formation = Formation::findOrFail($formationId);
 
-            // 1. Vérifier si la formation existe
-            $formation = Formation::findOrFail($formationId);
+    //         // 2. Vérifier si l'étudiant est inscrit à la formation
+    //         if (!$formation->students()->where('users.id', $studentId)->exists()) {
+    //             throw new \Exception('Student not enrolled in this formation');
+    //         }
 
-            // 2. Vérifier si l'étudiant est inscrit à la formation
-            if (!$formation->students()->where('users.id', $studentId)->exists()) {
-                throw new \Exception('Student not enrolled in this formation');
-            }
+    //         // 3. Trouver la session où l'étudiant est inscrit
+    //         $session = $formation->sessions()
+    //             ->whereHas('students', function ($query) use ($studentId) {
+    //                 $query->where('users.id', $studentId);
+    //             })
+    //             ->first();
 
-            // 3. Trouver la session où l'étudiant est inscrit
-            $session = $formation->sessions()
-                ->whereHas('students', function ($query) use ($studentId) {
-                    $query->where('users.id', $studentId);
-                })
-                ->first();
+    //         // 4. Si l'étudiant est inscrit à une session, le désinscrire
+    //         if ($session) {
+    //             $session->students()->detach($studentId);
+    //             $session->decrement('enrolled_students');
+    //         }
 
-            // 4. Si l'étudiant est inscrit à une session, le désinscrire
-            if ($session) {
-                $session->students()->detach($studentId);
-                $session->decrement('enrolled_students');
-            }
+    //         // 5. Désinscrire de la formation
+    //         $formation->students()->detach($studentId);
 
-            // 5. Désinscrire de la formation
-            $formation->students()->detach($studentId);
-
-            DB::commit();
-            return true;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to unenroll student', [
-                'student_id' => $studentId,
-                'formation_id' => $formationId,
-                'error' => $e->getMessage()
-            ]);
-            return false;
-        }
-    }
+    //         DB::commit();
+    //         return true;
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Failed to unenroll student', [
+    //             'student_id' => $studentId,
+    //             'formation_id' => $formationId,
+    //             'error' => $e->getMessage()
+    //         ]);
+    //         return false;
+    //     }
+    // }
 
     public function getEnrolledStudents($formationId)
     {

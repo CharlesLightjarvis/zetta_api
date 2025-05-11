@@ -8,6 +8,7 @@ use App\Http\Requests\v1\Attendance\UpdateAttendanceRequest;
 use App\Http\Services\V1\AttendanceService;
 use App\Trait\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AttendanceController extends Controller
 {
@@ -93,5 +94,39 @@ class AttendanceController extends Controller
         }
 
         return $this->errorResponse('Failed to delete attendance', 400);
+    }
+
+    public function getTeacherAttendances(Request $request)
+    {
+        // Récupérer l'ID du professeur connecté
+        $teacherId = Auth::user()->id;
+        
+        // Récupérer les filtres de la requête
+        $filters = $request->only([
+            'date_from',
+            'date_to',
+            'status',
+            'student_id',
+            'session_id',
+            'formation_id'
+        ]);
+        
+        // Valider les filtres
+        $request->validate([
+            'date_from' => 'nullable|date',
+            'date_to' => 'nullable|date|after_or_equal:date_from',
+            'status' => 'nullable|string|in:present,absent,late,excused',
+            'student_id' => 'nullable|string|exists:users,id',
+            'session_id' => 'nullable|string|exists:formation_sessions,id',
+            'formation_id' => 'nullable|string|exists:formations,id'
+        ]);
+        
+        $attendances = $this->attendanceService->getTeacherAttendances($teacherId, $filters);
+        
+        return $this->successResponse(
+            'Teacher attendances retrieved successfully',
+            'attendances',
+            $attendances
+        );
     }
 }

@@ -15,7 +15,7 @@ class UpdatePaymentRequest extends FormRequest
     {
         return [
             'student_id' => 'sometimes|required|uuid|exists:users,id',
-            'formation_id' => 'sometimes|required|uuid|exists:formations,id',
+            'session_id' => 'sometimes|required|uuid|exists:formation_sessions,id',
             'amount' => 'sometimes|required|numeric|min:0',
             'payment_method' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
