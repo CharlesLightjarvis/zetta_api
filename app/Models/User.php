@@ -63,7 +63,7 @@ class User extends Authenticatable
 
     public function certifications(): BelongsToMany
     {
-        return $this->belongsToMany(Certification::class, 'certification_student', 'student_id', 'certification_id')->withTimestamps();
+        return $this->belongsToMany(Certification::class, 'certification_students', 'student_id', 'certification_id')->withTimestamps();
     }
 
     public function formations(): BelongsToMany
@@ -73,11 +73,11 @@ class User extends Authenticatable
 
     public function attendances(): HasMany
     {
-        return $this->hasMany(Attendance::class);
+        return $this->hasMany(Attendance::class, 'student_id');
     }
 
     public function payments(): HasMany
     {
-        return $this->hasMany(Payment::class);
+        return $this->hasMany(Payment::class, 'student_id');
     }
 }

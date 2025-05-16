@@ -25,6 +25,7 @@ class LessonResource extends JsonResource
             "name" => $this->resource->name,
             "slug" => $this->resource->slug,
             "description" => $this->resource->description,
+            "resources" => $this->whenLoaded('resources', fn() => ResourceResource::collection($this->resource->resources)),
             "module" => $this->whenLoaded('module', fn(): array => $this->getModuleData()),
             "created_at" => $this->resource->created_at->format('Y-m-d H:i'),
             "updated_at" => $this->resource->updated_at->format('Y-m-d H:i'),

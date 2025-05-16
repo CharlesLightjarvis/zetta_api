@@ -18,7 +18,7 @@ class Payment extends Model
         'payment_method',
         'status',
         'notes',
-        'payment_date'  
+        'payment_date'
     ];
 
     protected $casts = [
@@ -32,14 +32,21 @@ class Payment extends Model
         return $this->belongsTo(User::class, 'student_id');
     }
 
+    // Garder également la méthode session() si elle est utilisée ailleurs
     public function session(): BelongsTo
     {
-        return $this->belongsTo(FormationSession::class);
+        return $this->belongsTo(FormationSession::class, 'session_id');
     }
 
     // Méthode pour accéder à la formation via la session
-    public function formation()
+    // public function formation()
+    // {
+    //     // Vérifier si la session existe avant d'accéder à sa propriété formation
+    //     return $this->session ? $this->session->formation : null;
+    // }
+
+    public function formation(): BelongsTo
     {
-        return $this->session->formation;
+        return $this->belongsTo(Formation::class, 'formation_id');
     }
 }

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\v1\ResourceResource;
 
 /**
  * @property-read Formation $resource
@@ -39,7 +40,8 @@ class FormationResource extends JsonResource
             "duration" => $this->resource->duration,
             "price" => $this->resource->price,
             "discount_price" => $this->resource->discount_price,
-            "category" =>  new CategoryResource($this->resource->category),
+            "resources" => $this->whenLoaded('resources', fn() => ResourceResource::collection($this->resource->resources)),
+            "category" => new CategoryResource($this->resource->category),
             "link" => $this->resource->link,
             "prerequisites" => $this->resource->prerequisites,
             "objectives" => $this->resource->objectives,
@@ -86,7 +88,8 @@ class FormationResource extends JsonResource
                     return [
                         'id' => $lesson->id,
                         'name' => $lesson->name,
-                        'description' => $lesson->description
+                        'description' => $lesson->description,
+                        'resources' => isset($lesson->resources) ? ResourceResource::collection($lesson->resources)->toArray(request()) : []
                     ];
                 })
             ];
