@@ -254,7 +254,15 @@ class QuizService
 
     public function getAllQuizConfigurations()
     {
-        return QuizConfiguration::with('configurable')->get();
+        $quizConfig = QuizConfiguration::with('configurable')->get();
+        
+        // Logging pour déboguer module_distribution
+        Log::info('QuizConfiguration récupérée', [
+            
+            $quizConfig->toArray()
+        ]);
+        
+        return $quizConfig;
     }
 
     public function getAllQuestions()
