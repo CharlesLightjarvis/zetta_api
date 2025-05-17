@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\v1\AttendanceController;
+use App\Http\Controllers\v1\CourseSchedulesController;
 use App\Http\Controllers\v1\ResourceController;
 use App\Http\Controllers\v1\TeacherController;
 use Illuminate\Support\Facades\Route;
@@ -37,4 +38,5 @@ Route::prefix('teacher')->group(function () {
         Route::post('{id}', [ResourceController::class, 'update']);
         Route::delete('{id}', [ResourceController::class, 'destroy']);
     });
+
 });

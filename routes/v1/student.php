@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Http\Controllers\v1\CourseSchedulesController;
 use App\Http\Controllers\v1\PaymentController;
 use App\Http\Controllers\v1\StudentCertificationController;
 use App\Http\Controllers\v1\StudentController;
@@ -16,7 +16,6 @@ Route::prefix('student')->group(function () {
 
     Route::get('formations', [StudentFormationController::class, 'index']);
     Route::get('formations/{formationId}', [StudentFormationController::class, 'show']);
-
 
 
     Route::post('certifications/{certificationId}/quiz/submit', [StudentCertificationController::class, 'submitQuiz']);

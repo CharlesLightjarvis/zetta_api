@@ -13,8 +13,7 @@ use App\Http\Controllers\v1\RoleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\v1\UserController;
 use App\Http\Controllers\v1\CategoryController;
-
-
+use App\Http\Controllers\v1\CourseSchedulesController;
 
 Route::prefix('admin')->group(function () {
     Route::get('roles', [RoleController::class, '__invoke']);

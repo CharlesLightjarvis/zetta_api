@@ -60,4 +60,9 @@ class FormationSession extends Model
     {
         return $this->hasMany(Payment::class, 'session_id');
     }
+
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(CourseSchedule::class);
+    }
 }
