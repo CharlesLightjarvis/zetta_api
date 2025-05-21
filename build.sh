@@ -1,27 +1,20 @@
 #!/bin/bash
 
 # Activer le mode strict pour voir les erreurs
-# set -e
+set -e
 
 echo "🚀 Déploiement en cours..."
 
 # Aller dans le dossier de l'application
 cd /var/www/zetta_api
 
-echo "📋 État avant reset :"
-git status
-
-echo "📥 Réinitialisation du dépôt local..."
-git reset --hard
-git clean -fd
-
-echo "📋 État après reset :"
-git status
-
-echo "📥 Synchronisation avec la branche distante..."
-git fetch origin main
+# Forcer la remise à zéro des fichiers locaux avant de pull
+# echo "📥 Réinitialisation du dépôt local..."
+# git reset --hard HEAD
+# git clean -fd
+echo "📥 Mise à jour du dépôt depuis GitHub...."
+git fetch --all
 git reset --hard origin/main
-
 
 # Installer les dépendances Composer
 echo "📦 Installation des dépendances PHP..."
