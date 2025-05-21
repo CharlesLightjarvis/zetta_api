@@ -13,6 +13,7 @@ cd /var/www/zetta_api
 # git reset --hard HEAD
 # git clean -fd
 echo "📥 Mise à jour du dépôt depuis GitHub..."
+git config pull.rebase false
 git pull origin main
 
 # Installer les dépendances Composer
