@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://internal.zetta.test:5173', 'http://localhost:5173'],
+    'allowed_origins' => ['http://internal.zetta.test:5173', 'http://localhost:5173', 'https://internal.talkenoo.click'],
 
     'allowed_origins_patterns' => [],
 
