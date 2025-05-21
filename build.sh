@@ -11,7 +11,7 @@ cd /var/www/zetta_api
 echo "📋 État avant reset :"
 git status
 
-echo "📥 Réinitialisation du dépôt local..."
+echo "📥 Réinitialisation du dépôt local...."
 git reset --hard
 git clean -fd
 
