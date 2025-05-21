@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\v1\CourseSchedulesController;
+use App\Http\Controllers\v1\PrismController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,7 +21,8 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/schedules', [CourseSchedulesController::class, 'store']);
 
-
+    Route::post('/prism/ask', [PrismController::class, 'askQuestion']);
+    Route::post('/prism/clear', [PrismController::class, 'clearConversation']);
     
     // Routes pour les étudiants
     Route::get('/student/schedules', [CourseSchedulesController::class, 'getStudentSchedules']);
