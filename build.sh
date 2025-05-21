@@ -1,37 +1,31 @@
 #!/bin/bash
 
-# Activer le mode strict pour voir les erreurs
 set -e
 
 echo "🚀 Déploiement en cours..."
 
-# Aller dans le dossier de l'application
 cd /var/www/zetta_api
 
-# Forcer la remise à zéro des fichiers locaux avant de pull
-# echo "📥 Réinitialisation du dépôt local..."
-# git reset --hard HEAD
-# git clean -fd
+echo "📥 Sauvegarde du fichier .env..."
+cp .env /tmp/.env_backup
+
 echo "📥 Mise à jour du dépôt depuis GitHub...."
 git fetch --all
 git reset --hard origin/main
+git clean -fd
 
-# Installer les dépendances Composer
+echo "♻️ Restauration du fichier .env..."
+mv /tmp/.env_backup .env
+
 echo "📦 Installation des dépendances PHP..."
 composer install --no-dev --optimize-autoloader
 
-# Installer les dépendances npm (si frontend)
 echo "📦 Installation des dépendances npm..."
-npm install && npm run build
+command -v npm >/dev/null 2>&1 && npm install && npm run build || echo "⚠️ npm non installé, étape ignorée."
 
-# Mettre à jour l'environnement
 echo "⚙️  Configuration de l'environnement..."
-
-# Exécuter les migrations
-# echo "📊 Exécution des migrations..."
 php artisan migrate:refresh --seed --force
 
-# Vider et optimiser le cache
 echo "🧹 Nettoyage du cache..."
 php artisan cache:clear
 php artisan config:clear
@@ -43,7 +37,6 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Redémarrer les services
 echo "🔄 Redémarrage de PHP-FPM et Nginx..."
 systemctl restart php8.3-fpm
 systemctl restart nginx
