@@ -18,7 +18,7 @@ echo "♻️ Restauration du fichier .env..."
 mv /tmp/.env_backup .env
 
 echo "📦 Installation des dépendances PHP..."
-composer install --no-dev --optimize-autoloader
+composer install --optimize-autoloader
 
 echo "📦 Installation des dépendances npm..."
 command -v npm >/dev/null 2>&1 && npm install && npm run build || echo "⚠️ npm non installé, étape ignorée."
