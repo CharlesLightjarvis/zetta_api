@@ -18,6 +18,7 @@ echo "♻️ Restauration du fichier .env..."
 mv /tmp/.env_backup .env
 
 echo "📦 Installation des dépendances PHP..."
+composer require fakerphp/faker --no-dev
 composer install --optimize-autoloader
 
 echo "📦 Installation des dépendances npm..."
