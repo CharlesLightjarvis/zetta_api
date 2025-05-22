@@ -23,37 +23,37 @@ class UserSeeder extends Seeder
         ]);
         $admin->assignRole('admin');
 
-        // Création du teacher par défaut
-        $teacher = User::create([
-            'fullName' => 'Teacher Teacher',
-            'email' => 'teacher@gmail.com',
-            'bio' => 'Teacher bio',
-            'title' => 'Teacher title',
-            'password' => Hash::make('password'),
-        ]);
-        $teacher->assignRole('teacher');
+        // // Création du teacher par défaut
+        // $teacher = User::create([
+        //     'fullName' => 'Teacher Teacher',
+        //     'email' => 'teacher@gmail.com',
+        //     'bio' => 'Teacher bio',
+        //     'title' => 'Teacher title',
+        //     'password' => Hash::make('password'),
+        // ]);
+        // $teacher->assignRole('teacher');
 
-        // Création du student par défaut
-        $student = User::create([
-            'fullName' => 'Student Student',
-            'email' => 'student@gmail.com',
-            'password' => Hash::make('password'),
-        ]);
-        $student->assignRole('student');
+        // // Création du student par défaut
+        // $student = User::create([
+        //     'fullName' => 'Student Student',
+        //     'email' => 'student@gmail.com',
+        //     'password' => Hash::make('password'),
+        // ]);
+        // $student->assignRole('student');
 
-        // Création de 20 enseignants avec Faker
-        $faker = Faker::create();
+        // // Création de 20 enseignants avec Faker
+        // $faker = Faker::create();
 
-        for ($i = 0; $i < 20; $i++) {
-            $teacher = User::create([
-                'fullName' => $faker->name,
-                'email' => $faker->unique()->safeEmail,
-                'bio' => $faker->paragraph,
-                'phone' => $faker->phoneNumber,
-                'title' => $faker->jobTitle,
-                'password' => Hash::make('password'), // Mot de passe par défaut
-            ]);
-            $teacher->assignRole('teacher');
-        }
+        // for ($i = 0; $i < 20; $i++) {
+        //     $teacher = User::create([
+        //         'fullName' => $faker->name,
+        //         'email' => $faker->unique()->safeEmail,
+        //         'bio' => $faker->paragraph,
+        //         'phone' => $faker->phoneNumber,
+        //         'title' => $faker->jobTitle,
+        //         'password' => Hash::make('password'), // Mot de passe par défaut
+        //     ]);
+        //     $teacher->assignRole('teacher');
+        // }
     }
 }
