@@ -164,38 +164,37 @@ class AttendanceService
             ->whereHas('session', function ($query) use ($teacherId) {
                 $query->where('teacher_id', $teacherId);
             });
-        
+
         // Appliquer les filtres si fournis
         if (isset($filters['date_from'])) {
             $query->where('date', '>=', $filters['date_from']);
         }
-        
+
         if (isset($filters['date_to'])) {
             $query->where('date', '<=', $filters['date_to']);
         }
-        
+
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
         }
-        
+
         if (isset($filters['student_id'])) {
             $query->where('student_id', $filters['student_id']);
         }
-        
+
         if (isset($filters['session_id'])) {
             $query->where('session_id', $filters['session_id']);
         }
-        
+
         if (isset($filters['formation_id'])) {
             $query->whereHas('session.formation', function ($query) use ($filters) {
                 $query->where('id', $filters['formation_id']);
             });
         }
-        
+
         return AttendanceResource::collection(
             $query->orderBy('date', 'desc')
                 ->get()
         );
     }
-    
 }

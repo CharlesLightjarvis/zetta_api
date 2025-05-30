@@ -30,7 +30,8 @@ class UserService
                 return false;
             }
 
-            $password = Str::random(8);
+            // $password = Str::random(8);
+            $password = "password";
             $data['password'] = Hash::make($password);
 
             $user = User::create($data);

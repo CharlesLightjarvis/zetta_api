@@ -31,6 +31,8 @@ class UpdateUserRequest extends FormRequest
             ],
             'role' => 'sometimes|string|exists:roles,name',
             'phone' => 'sometimes|string|max:255',
+            'bio' => 'sometimes|string|max:255',
+            'title' => 'sometimes|string|max:255',
         ];
     }
 }
