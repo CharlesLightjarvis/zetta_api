@@ -26,7 +26,6 @@ class UpdateCertificationRequest extends FormRequest
             'description' => 'sometimes|nullable|string|max:1000',
             'image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Modifié            'provider' => 'sometimes|required|string|max:255',
             'validity_period' => 'sometimes|required|integer|min:1',
-            'formation_id' => 'sometimes|required|uuid|exists:formations,id',
             'level' => 'sometimes|required|string|max:255',
             'benefits' => 'sometimes|nullable|array',
             'benefits.*' => 'sometimes|nullable|string',  // Ajout de la validation pour chaque élément
@@ -36,6 +35,8 @@ class UpdateCertificationRequest extends FormRequest
             'prerequisites.*' => 'sometimes|nullable|string',  // Ajout de la validation pour chaque élément
             'skills' => 'sometimes|nullable|array',
             'skills.*' => 'sometimes|nullable|string',    // Ajout de la validation pour chaque élément
+            'formation_ids' => 'sometimes|nullable|array',
+            'formation_ids.*' => 'required|uuid|exists:formations,id',
         ];
     }
 }

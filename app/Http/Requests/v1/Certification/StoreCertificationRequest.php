@@ -27,7 +27,6 @@ class StoreCertificationRequest extends FormRequest
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Modifié
             'provider' => 'required|string|max:255',
             'validity_period' => 'required|integer|min:1',
-            'formation_id' => 'required|uuid|exists:formations,id',
             'level' => 'required|string|max:255',
             'benefits' => 'nullable|array',
             'benefits.*' => 'nullable|string',  // Ajout de la validation pour chaque élément

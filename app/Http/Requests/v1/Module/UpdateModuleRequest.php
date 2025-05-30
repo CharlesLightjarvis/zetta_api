@@ -24,11 +24,11 @@ class UpdateModuleRequest extends FormRequest
         return [
             'name' => 'sometimes|string|max:255',
             'description' => 'sometimes|nullable|string|max:1000',
-            'formation_ids' => 'sometimes|nullable|array',
-            'formation_ids.*' => 'required|uuid|exists:formations,id',
-            'lessons' => 'sometimes|nullable|array',
-            'lessons.*.name' => 'required|string|max:255',
-            'lessons.*.description' => 'nullable|string|max:1000',
+            'existing_lesson_ids' => 'sometimes|nullable|array',
+            'existing_lesson_ids.*' => 'required|string|exists:lessons,id',
+            'new_lessons' => 'sometimes|nullable|array',
+            'new_lessons.*.name' => 'required|string|max:255',
+            'new_lessons.*.description' => 'nullable|string|max:1000',
         ];
     }
 }

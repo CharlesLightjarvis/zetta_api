@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Storage;
  * @property string|null $best_for
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
- * @property-read \App\Models\Formation|null $formation
+ * @property-read \App\Models\Formation|null $formations
  */
 class CertificationResource extends JsonResource
 {
@@ -44,12 +44,14 @@ class CertificationResource extends JsonResource
             "level" => $this->level,
             "benefits" => $this->benefits,
             "link" => $this->link,
-            "formation" => $this->whenLoaded('formation', function () {
-                return [
-                    'id' => $this->formation?->id,
-                    'name' => $this->formation?->name,
-                    'category' => $this->formation?->category?->name
-                ];
+            "formations" => $this->whenLoaded('formations', function () {
+                return $this->formations->map(function ($formation) {
+                    return [
+                        'id' => $formation->id,
+                        'name' => $formation->name,
+                        'category' => $formation->category?->name,
+                    ];
+                });
             }),
             "prerequisites" => $this->prerequisites,
             "skills" => $this->skills,

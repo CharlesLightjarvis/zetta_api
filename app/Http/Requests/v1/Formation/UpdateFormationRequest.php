@@ -38,7 +38,9 @@ class UpdateFormationRequest extends FormRequest
             'objectives' => 'sometimes|nullable|array',
             'objectives.*' => 'sometimes|nullable|string',
             'module_ids' => 'sometimes|nullable|array',
-            'module_ids.*' => 'required|uuid|exists:modules,id',
+            'module_ids.*' => 'uuid|exists:modules,id',
+            'certification_ids' => 'sometimes|nullable|array',
+            'certification_ids.*' => 'uuid|exists:certifications,id',
             // Ajout des règles pour les sessions
             'sessions' => 'sometimes|nullable|array',
             'sessions.*.teacher_id' => 'nullable|uuid|exists:users,id',
@@ -77,7 +79,7 @@ class UpdateFormationRequest extends FormRequest
                 }
             ],
             'sessions.*.capacity' => 'required|integer|min:1',
-            'discount_price' => 'sometimes|integer|min:0|gte:price',
+            'discount_price' => 'sometimes|integer|min:0|lte:price',
         ];
     }
 }

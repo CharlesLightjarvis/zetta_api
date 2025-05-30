@@ -43,9 +43,9 @@ class Formation extends Model
         return $this->belongsToMany(User::class, 'formation_student', 'formation_id', 'student_id')->withTimestamps();
     }
 
-    public function certifications(): HasMany
+    public function certifications(): BelongsToMany
     {
-        return $this->hasMany(Certification::class);
+        return $this->belongsToMany(Certification::class, 'formation_certifications', 'formation_id', 'certification_id')->withTimestamps();
     }
 
     public function modules(): BelongsToMany

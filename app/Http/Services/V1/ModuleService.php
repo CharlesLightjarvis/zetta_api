@@ -4,8 +4,10 @@ namespace App\Http\Services\V1;
 
 use App\Http\Resources\v1\ModuleResource;
 use App\Models\Formation;
+use App\Models\Lesson;
 use App\Models\Module;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ModuleService
@@ -29,31 +31,27 @@ class ModuleService
         try {
             DB::beginTransaction();
 
-            // Vérification du slug unique
             $slug = Str::slug($data['name']);
-            $moduleExists = Module::where('slug', $slug)->exists();
-            if ($moduleExists) {
+            if (Module::where('slug', $slug)->exists()) {
                 return false;
             }
 
-            // Création du module
             $module = Module::create([
                 'name' => $data['name'],
                 'slug' => $slug,
                 'description' => $data['description'] ?? null,
             ]);
 
-            // Attacher les formations si fournies
-            if (isset($data['formation_ids']) && is_array($data['formation_ids'])) {
-                $formations = Formation::whereIn('id', $data['formation_ids'])->get();
-                if ($formations->count() > 0) {
-                    $module->formations()->attach($formations);
-                }
+            // Attacher les leçons existantes (update du module_id)
+            if (!empty($data['existing_lesson_ids']) && is_array($data['existing_lesson_ids'])) {
+                Lesson::whereIn('id', $data['existing_lesson_ids'])->update([
+                    'module_id' => $module->id,
+                ]);
             }
 
-            // Création des leçons si fournies
-            if (isset($data['lessons']) && is_array($data['lessons'])) {
-                foreach ($data['lessons'] as $lessonData) {
+            // Créer les nouvelles leçons
+            if (!empty($data['new_lessons']) && is_array($data['new_lessons'])) {
+                foreach ($data['new_lessons'] as $lessonData) {
                     $module->lessons()->create([
                         'name' => $lessonData['name'],
                         'slug' => Str::slug($lessonData['name']),
@@ -66,53 +64,46 @@ class ModuleService
             return true;
         } catch (\Exception $e) {
             DB::rollback();
+            Log::error("Erreur createModule: " . $e->getMessage());
             return false;
         }
     }
 
-    public function updateModule($id, $data)
+
+    public function updateModule($moduleId, $data)
     {
         try {
             DB::beginTransaction();
 
-            $module = Module::find($id);
-            if (!$module) {
+            $module = Module::findOrFail($moduleId);
+
+            $slug = Str::slug($data['name']);
+            if (Module::where('slug', $slug)->where('id', '!=', $moduleId)->exists()) {
                 return false;
             }
 
-            // Si le nom est modifié, vérifier que le nouveau slug n'existe pas déjà
-            if (isset($data['name'])) {
-                $newSlug = Str::slug($data['name']);
-                if ($newSlug !== $module->slug) {
-                    $slugExists = Module::where('slug', $newSlug)
-                        ->where('id', '!=', $id)
-                        ->exists();
-                    if ($slugExists) {
-                        return false;
-                    }
-                    $data['slug'] = $newSlug;
-                }
-            }
-
+            // Mettre à jour le module
             $module->update([
-                'name' => $data['name'] ?? $module->name,
-                'slug' => $data['slug'] ?? $module->slug,
-                'description' => $data['description'] ?? $module->description,
+                'name' => $data['name'],
+                'slug' => $slug,
+                'description' => $data['description'] ?? null,
             ]);
 
-            // Mise à jour des formations si fournies
-            if (isset($data['formation_ids'])) {
-                $formations = Formation::whereIn('id', $data['formation_ids'])->get();
-                $module->formations()->sync($formations);
+            // Détacher toutes les anciennes leçons du module
+            Lesson::where('module_id', $module->id)->update([
+                'module_id' => null,
+            ]);
+
+            // Réattacher les leçons existantes (update du module_id)
+            if (!empty($data['existing_lesson_ids']) && is_array($data['existing_lesson_ids'])) {
+                Lesson::whereIn('id', $data['existing_lesson_ids'])->update([
+                    'module_id' => $module->id,
+                ]);
             }
 
-            // Mise à jour des leçons si fournies
-            if (isset($data['lessons']) && is_array($data['lessons'])) {
-                // Supprimer les leçons existantes
-                $module->lessons()->delete();
-
-                // Créer les nouvelles leçons
-                foreach ($data['lessons'] as $lessonData) {
+            // Créer les nouvelles leçons
+            if (!empty($data['new_lessons']) && is_array($data['new_lessons'])) {
+                foreach ($data['new_lessons'] as $lessonData) {
                     $module->lessons()->create([
                         'name' => $lessonData['name'],
                         'slug' => Str::slug($lessonData['name']),
@@ -121,13 +112,20 @@ class ModuleService
                 }
             }
 
+            // Sync formations
+            if (!empty($data['formation_ids']) && is_array($data['formation_ids'])) {
+                $module->formations()->sync($data['formation_ids']);
+            }
+
             DB::commit();
             return true;
         } catch (\Exception $e) {
-            DB::rollback();
+            DB::rollBack();
+            Log::error("Erreur updateModule: " . $e->getMessage());
             return false;
         }
     }
+
 
     public function deleteModule($id)
     {

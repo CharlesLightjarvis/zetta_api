@@ -24,11 +24,13 @@ class StoreModuleRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'formation_ids' => 'nullable|array',
-            'formation_ids.*' => 'required|uuid|exists:formations,id',
-            'lessons' => 'nullable|array',
-            'lessons.*.name' => 'required|string|max:255',
-            'lessons.*.description' => 'nullable|string|max:1000',
+            // 'formation_ids' => 'nullable|array',
+            // 'formation_ids.*' => 'required|uuid|exists:formations,id',
+            'existing_lesson_ids' => 'nullable|array',
+            'existing_lesson_ids.*' => 'required|string|exists:lessons,id',
+            'new_lessons' => 'nullable|array',
+            'new_lessons.*.name' => 'required|string|max:255',
+            'new_lessons.*.description' => 'nullable|string|max:1000',
         ];
     }
 }

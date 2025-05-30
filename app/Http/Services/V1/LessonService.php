@@ -35,10 +35,10 @@ class LessonService
             }
 
             // Vérification si le module existe
-            $module = Module::find($data['module_id']);
-            if (!$module) {
-                return false;
-            }
+            // $module = Module::find($data['module_id']);
+            // if (!$module) {
+            //     return false;
+            // }
 
             // Ajout du slug aux données
             $data['slug'] = $slug;

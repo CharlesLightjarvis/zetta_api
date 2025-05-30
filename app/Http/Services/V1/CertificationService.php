@@ -15,13 +15,13 @@ class CertificationService
     public function getAllCertifications()
     {
         return CertificationResource::collection(
-            Certification::with('formation')->get()
+            Certification::with('formations')->get()
         );
     }
 
     public function getCertificationById($id)
     {
-        return new CertificationResource(Certification::with('formation')->findOrFail($id));
+        return new CertificationResource(Certification::with('formations')->findOrFail($id));
     }
 
     public function createCertification($data)
@@ -43,10 +43,10 @@ class CertificationService
             }
 
             // Vérification si la formation existe
-            $formation = Formation::find($data['formation_id']);
-            if (!$formation) {
-                return false;
-            }
+            // $formation = Formation::find($data['formation_id']);
+            // if (!$formation) {
+            //     return false;
+            // }
 
             // Ajout du slug aux données
             $data['slug'] = $slug;
@@ -107,14 +107,6 @@ class CertificationService
                 }
             }
 
-            // Vérifier la formation si l'ID est modifié
-            if (isset($data['formation_id'])) {
-                $formation = Formation::find($data['formation_id']);
-                if (!$formation) {
-                    return false;
-                }
-            }
-
             // Gérer les champs de type tableau
             $arrayFields = ['benefits', 'skills', 'best_for', 'prerequisites'];
             foreach ($arrayFields as $field) {
@@ -128,6 +120,11 @@ class CertificationService
             }
 
             $certification->update($data);
+
+            // === AJOUT MANY TO MANY FORMATIONS ===
+            if (isset($data['formation_ids']) && is_array($data['formation_ids'])) {
+                $certification->formations()->sync($data['formation_ids']);
+            }
 
             DB::commit();
             return true;
@@ -152,6 +149,9 @@ class CertificationService
             if ($certification->image) {
                 Storage::disk('public')->delete($certification->image);
             }
+
+            // Détacher les formations liées (many-to-many)
+            $certification->formations()->detach();
 
             $certification->delete();
             return true;

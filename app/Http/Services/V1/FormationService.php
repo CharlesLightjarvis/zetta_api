@@ -5,6 +5,7 @@ namespace App\Http\Services\V1;
 use App\Http\Resources\v1\FormationResource;
 use App\Http\Resources\v1\UserResource;
 use App\Models\Category;
+use App\Models\Certification;
 use App\Models\Formation;
 use App\Models\Module;
 use App\Models\User;
@@ -68,6 +69,14 @@ class FormationService
                 }
             }
 
+            // Attacher les certifications si fournis
+            if (isset($data['certification_ids']) && is_array($data['certification_ids'])) {
+                $certifications = Certification::whereIn('id', $data['certification_ids'])->get();
+                if ($certifications->count() > 0) {
+                    $formation->certifications()->attach($certifications);
+                }
+            }
+
             // Créer les sessions si fournies
             if (isset($data['sessions']) && is_array($data['sessions'])) {
                 foreach ($data['sessions'] as $sessionData) {
@@ -90,13 +99,16 @@ class FormationService
     public function updateFormation($id, $data)
     {
         try {
+            Log::info('--- [updateFormation] Début ---');
+            Log::info('ID reçu : ' . $id);
+            Log::info('Données reçues : ' . json_encode($data));
             DB::beginTransaction();
 
-            $formation = Formation::find($id);
+            // Récupérer la formation par ID
+            $formation = Formation::findOrFail($id);
             if (!$formation) {
                 return false;
             }
-
 
             // Gestion de l'image
             if (isset($data['image']) && $data['image']->isValid()) {
@@ -108,66 +120,77 @@ class FormationService
                 $data['image'] = $imagePath;
             }
 
-            if (isset($data['name'])) {
-                $newSlug = Str::slug($data['name']);
-                if ($newSlug !== $formation->slug) {
-                    $slugExists = Formation::where('slug', $newSlug)
-                        ->where('id', '!=', $id)
-                        ->exists();
-                    if ($slugExists) {
-                        return false;
-                    }
-                    $data['slug'] = $newSlug;
-                }
-            }
-
-            if (isset($data['category_id'])) {
-                $category = Category::find($data['category_id']);
-                if (!$category) {
+            // Gestion du slug uniquement si le nom a changé
+            if (isset($data['name']) && $data['name'] !== $formation->name) {
+                $slug = Str::slug($data['name']);
+                $existingFormation = Formation::where('slug', $slug)
+                    ->where('id', '!=', $formation->id)
+                    ->exists();
+                if ($existingFormation) {
                     return false;
                 }
+                $data['slug'] = $slug;
             }
 
+            // Filtrer les tableaux vides
             if (isset($data['prerequisites'])) {
-                $data['prerequisites'] = array_filter($data['prerequisites']);
-            }
-            if (isset($data['objectives'])) {
-                $data['objectives'] = array_filter($data['objectives']);
+                $data['prerequisites'] = array_filter($data['prerequisites'], fn($value) => $value !== '');
+                if (empty($data['prerequisites'])) {
+                    $data['prerequisites'] = null;
+                }
             }
 
+            if (isset($data['objectives'])) {
+                $data['objectives'] = array_filter($data['objectives'], fn($value) => $value !== '');
+                if (empty($data['objectives'])) {
+                    $data['objectives'] = null;
+                }
+            }
+
+            // Mise à jour des données de base
             $formation->update($data);
 
-            // Mise à jour des modules si fournis
-            if (isset($data['module_ids'])) {
-                $modules = Module::whereIn('id', $data['module_ids'])->get();
-                $formation->modules()->sync($modules);
-            }
-
-            // Mise à jour des sessions si fournies
-            if (isset($data['sessions'])) {
-                $existingSessionIds = $formation->sessions()->pluck('id')->toArray();
-                $updatedSessionIds = [];
-
-                foreach ($data['sessions'] as $sessionData) {
-                    if (isset($sessionData['id'])) {
-                        // Mise à jour d'une session existante
-                        $session = $formation->sessions()->find($sessionData['id']);
-                        if ($session) {
-                            $session->update($sessionData);
-                            $updatedSessionIds[] = $session->id;
-                        }
-                    } else {
-                        // Création d'une nouvelle session
-                        $sessionData['formation_id'] = $formation->id;
-                        $session = $formation->sessions()->create($sessionData);
-                        $updatedSessionIds[] = $session->id;
+            // Synchronisation des relations many-to-many
+            // TOUJOURS synchroniser les modules, même si le tableau est vide
+            if (array_key_exists('module_ids', $data)) {
+                $moduleIds = [];
+                if (is_array($data['module_ids'])) {
+                    $moduleIds = array_filter($data['module_ids'], fn($value) => $value !== '' && $value !== null);
+                } else if (is_string($data['module_ids']) && $data['module_ids'] !== '') {
+                    // Si c'est un JSON string, le décoder
+                    $decoded = json_decode($data['module_ids'], true);
+                    if (is_array($decoded)) {
+                        $moduleIds = array_filter($decoded, fn($value) => $value !== '' && $value !== null);
                     }
                 }
+                $formation->modules()->sync($moduleIds);
+                Log::info('Modules synchronisés : ' . json_encode($moduleIds));
+            }
 
-                // Suppression des sessions qui ne sont plus dans la liste
-                $sessionsToDelete = array_diff($existingSessionIds, $updatedSessionIds);
-                if (!empty($sessionsToDelete)) {
-                    $formation->sessions()->whereIn('id', $sessionsToDelete)->delete();
+            // TOUJOURS synchroniser les certifications, même si le tableau est vide
+            if (array_key_exists('certification_ids', $data)) {
+                $certificationIds = [];
+                if (is_array($data['certification_ids'])) {
+                    $certificationIds = array_filter($data['certification_ids'], fn($value) => $value !== '' && $value !== null);
+                } else if (is_string($data['certification_ids']) && $data['certification_ids'] !== '') {
+                    // Si c'est un JSON string, le décoder
+                    $decoded = json_decode($data['certification_ids'], true);
+                    if (is_array($decoded)) {
+                        $certificationIds = array_filter($decoded, fn($value) => $value !== '' && $value !== null);
+                    }
+                }
+                $formation->certifications()->sync($certificationIds);
+                Log::info('Certifications synchronisées : ' . json_encode($certificationIds));
+            }
+
+            // Gestion des sessions
+            if (isset($data['sessions'])) {
+                // Supprimer les anciennes sessions
+                $formation->sessions()->delete();
+
+                // Créer les nouvelles sessions
+                foreach ($data['sessions'] as $sessionData) {
+                    $formation->sessions()->create($sessionData);
                 }
             }
 
@@ -175,6 +198,10 @@ class FormationService
             return true;
         } catch (\Exception $e) {
             DB::rollback();
+            if (isset($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            Log::error('Erreur updateFormation : ' . $e->getMessage());
             return false;
         }
     }
@@ -182,7 +209,12 @@ class FormationService
     public function deleteFormation($id)
     {
         $formation = Formation::find($id);
-        return $formation ? $formation->delete() : false;
+        if (!$formation) return false;
+
+        // Détacher les certifications liées (many-to-many)
+        $formation->certifications()->detach();
+
+        return $formation->delete();
     }
 
     // public function enrollExistingStudent(string $formationId, string $studentId): bool

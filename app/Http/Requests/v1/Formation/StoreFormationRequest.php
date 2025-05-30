@@ -39,6 +39,8 @@ class StoreFormationRequest extends FormRequest
             'objectives.*' => 'nullable|string',
             'module_ids' => 'nullable|array',
             'module_ids.*' => 'required|uuid|exists:modules,id',
+            'certification_ids' => 'nullable|array',
+            'certification_ids.*' => 'required|uuid|exists:certifications,id',
             // Ajout des règles pour les sessions
             'sessions' => 'nullable|array',
             'sessions.*.teacher_id' => 'nullable|uuid|exists:users,id',
@@ -69,7 +71,7 @@ class StoreFormationRequest extends FormRequest
                 }
             ],
             'sessions.*.capacity' => 'required|integer|min:1',
-            'discount_price' => 'required|integer|min:0|gte:price',
+            'discount_price' => 'sometimes|integer|min:0|lte:price',
         ];
     }
 }

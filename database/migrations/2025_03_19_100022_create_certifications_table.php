@@ -15,7 +15,6 @@ return new class extends Migration
         Schema::create('certifications', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('slug')->unique();
-            $table->foreignUuid('formation_id')->constrained('formations')->cascadeOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('image')->nullable();

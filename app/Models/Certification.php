@@ -22,7 +22,6 @@ class Certification extends Model
     protected $fillable = [
         'name',
         'description',
-        'formation_id',
         'image',
         'provider',
         'validity_period',
@@ -40,9 +39,9 @@ class Certification extends Model
         return "/certifications/" . $this->slug;
     }
 
-    public function formation(): BelongsTo
+    public function formations(): BelongsToMany
     {
-        return $this->belongsTo(Formation::class);
+        return $this->belongsToMany(Formation::class, 'formation_certifications', 'certification_id', 'formation_id')->withTimestamps();
     }
 
     public function students(): BelongsToMany

@@ -23,7 +23,7 @@ class StoreLessonRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'module_id' => 'required|uuid|exists:modules,id',
+            'module_id' => 'sometimes|nullable|uuid|exists:modules,id',
             'description' => 'nullable|string|max:1000',
         ];
     }
