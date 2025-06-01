@@ -13,7 +13,7 @@ class CourseSchedulesController extends Controller
 {
 
     protected $scheduleService;
-    
+
     public function __construct(CourseScheduleService $scheduleService)
     {
         $this->scheduleService = $scheduleService;
@@ -27,8 +27,8 @@ class CourseSchedulesController extends Controller
         //
     }
 
-  
-    
+
+
     /**
      * Créer un nouvel horaire de cours avec plusieurs jours
      */
@@ -44,23 +44,23 @@ class CourseSchedulesController extends Controller
             'recurrence' => 'required|in:weekly,biweekly,monthly',
             'teacher_id' => 'nullable|exists:users,id',
         ]);
-        
+
         $schedule = $this->scheduleService->createSchedule($validated);
-        
+
         return response()->json($schedule, 201);
     }
 
-    public function getTeacherSchedules( $teacherId)
+    public function getTeacherSchedules($teacherId)
     {
         return $this->scheduleService->getTeacherSchedules($teacherId);
     }
 
-    public function getStudentSchedules( $studentId)
+    public function getStudentSchedules($studentId)
     {
         return $this->scheduleService->getStudentSchedules($studentId);
     }
 
-    public function getSessionSchedules( $sessionId)
+    public function getSessionSchedules($sessionId)
     {
         return $this->scheduleService->getSessionSchedules($sessionId);
     }
@@ -70,7 +70,7 @@ class CourseSchedulesController extends Controller
         return $this->scheduleService->getWeekSchedules($weekStart, $sessionId);
     }
 
-     /**
+    /**
      * Obtenir les horaires pour un intervalle de dates spécifique
      */
     public function getDateRangeSchedules(Request $request)
@@ -98,7 +98,7 @@ class CourseSchedulesController extends Controller
             'session_id' => $request->session_id,
             'teacher_id' => $request->teacher_id
         ]);
-        
+
         $schedules = $this->scheduleService->getSchedulesByDateRange(
             $startDate,
             $endDate,
@@ -106,10 +106,10 @@ class CourseSchedulesController extends Controller
             $request->session_id,
             $request->teacher_id
         );
-        
+
         return response()->json($schedules);
     }
-    
+
     /**
      * Display the specified resource.
      */

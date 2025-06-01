@@ -25,6 +25,7 @@ class UpdateLessonRequest extends FormRequest
             'name' => 'sometimes|string|max:255',
             'module_id' => 'sometimes|uuid|exists:modules,id',
             'description' => 'sometimes|nullable|string|max:1000',
+            'duration' => 'sometimes|integer|min:0',
         ];
     }
 }

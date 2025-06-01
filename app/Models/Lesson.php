@@ -16,6 +16,7 @@ class Lesson extends Model
         'module_id',
         'description',
         'slug',
+        'duration',
     ];
 
     public function module(): BelongsTo

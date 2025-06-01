@@ -44,7 +44,7 @@ class LessonService
             $data['slug'] = $slug;
 
             // Création de la leçon
-            $lesson = Lesson::create($data);
+            Lesson::create($data);
 
             DB::commit();
             return true;

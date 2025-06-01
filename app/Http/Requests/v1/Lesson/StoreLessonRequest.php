@@ -25,6 +25,7 @@ class StoreLessonRequest extends FormRequest
             'name' => 'required|string|max:255',
             'module_id' => 'sometimes|nullable|uuid|exists:modules,id',
             'description' => 'nullable|string|max:1000',
+            'duration' => 'required|integer|min:0',
         ];
     }
 }

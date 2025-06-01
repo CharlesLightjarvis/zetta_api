@@ -187,55 +187,55 @@ class FormationSessionService
     }
 
     public function unenrollStudent($studentId, $sessionId)
-{
-    try {
-        DB::beginTransaction();
+    {
+        try {
+            DB::beginTransaction();
 
-        // 1. Trouver la session
-        $session = FormationSession::find($sessionId);
-        if (!$session) {
-            throw new \Exception('Session not found');
+            // 1. Trouver la session
+            $session = FormationSession::find($sessionId);
+            if (!$session) {
+                throw new \Exception('Session not found');
+            }
+
+            // 2. Vérifier si l'étudiant est inscrit à cette session
+            if (!$session->students()->where('users.id', $studentId)->exists()) {
+                throw new \Exception('Student not enrolled in this session');
+            }
+
+            // 3. Désinscrire l'étudiant de la session
+            $session->students()->detach($studentId);
+            $session->decrement('enrolled_students');
+
+            // 4. Récupérer la formation associée
+            $formation = $session->formation;
+            if (!$formation) {
+                throw new \Exception('Formation not found for this session');
+            }
+
+            // 5. Vérifier si l'étudiant est inscrit à d'autres sessions de cette formation
+            $otherSessionsCount = $formation->sessions()
+                ->whereHas('students', function ($query) use ($studentId) {
+                    $query->where('users.id', $studentId);
+                })
+                ->count();
+
+            // 6. Si l'étudiant n'est inscrit à aucune autre session, le désinscrire de la formation
+            if ($otherSessionsCount === 0) {
+                $formation->students()->detach($studentId);
+            }
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Failed to unenroll student', [
+                'student_id' => $studentId,
+                'session_id' => $sessionId,
+                'error' => $e->getMessage()
+            ]);
+            return false;
         }
-
-        // 2. Vérifier si l'étudiant est inscrit à cette session
-        if (!$session->students()->where('users.id', $studentId)->exists()) {
-            throw new \Exception('Student not enrolled in this session');
-        }
-
-        // 3. Désinscrire l'étudiant de la session
-        $session->students()->detach($studentId);
-        $session->decrement('enrolled_students');
-
-        // 4. Récupérer la formation associée
-        $formation = $session->formation;
-        if (!$formation) {
-            throw new \Exception('Formation not found for this session');
-        }
-
-        // 5. Vérifier si l'étudiant est inscrit à d'autres sessions de cette formation
-        $otherSessionsCount = $formation->sessions()
-            ->whereHas('students', function ($query) use ($studentId) {
-                $query->where('users.id', $studentId);
-            })
-            ->count();
-
-        // 6. Si l'étudiant n'est inscrit à aucune autre session, le désinscrire de la formation
-        if ($otherSessionsCount === 0) {
-            $formation->students()->detach($studentId);
-        }
-
-        DB::commit();
-        return true;
-    } catch (\Exception $e) {
-        DB::rollback();
-        Log::error('Failed to unenroll student', [
-            'student_id' => $studentId,
-            'session_id' => $sessionId,
-            'error' => $e->getMessage()
-        ]);
-        return false;
     }
-}
 
     public function getAvailableSessions($formationId)
     {

@@ -123,7 +123,8 @@ class TeacherController extends Controller
         // 5. Statistiques des certifications
         $certificationStats = [
             'total_certifications' => DB::table('certifications')
-                ->join('formations', 'certifications.formation_id', '=', 'formations.id')
+                ->join('formation_certifications', 'certifications.id', '=', 'formation_certifications.certification_id')
+                ->join('formations', 'formation_certifications.formation_id', '=', 'formations.id')
                 ->join('formation_sessions', 'formations.id', '=', 'formation_sessions.formation_id')
                 ->where('formation_sessions.teacher_id', $teacher->id)
                 ->distinct('certifications.id')
@@ -131,7 +132,8 @@ class TeacherController extends Controller
             'certification_success_rate' => DB::table('progress_tracking')
                 ->join('certifications', 'progress_tracking.trackable_id', '=', 'certifications.id')
                 ->where('progress_tracking.trackable_type', 'App\\Models\\Certification')
-                ->join('formations', 'certifications.formation_id', '=', 'formations.id')
+                ->join('formation_certifications', 'certifications.id', '=', 'formation_certifications.certification_id')
+                ->join('formations', 'formation_certifications.formation_id', '=', 'formations.id')
                 ->join('formation_sessions', 'formations.id', '=', 'formation_sessions.formation_id')
                 ->where('formation_sessions.teacher_id', $teacher->id)
                 ->select(
