@@ -56,6 +56,7 @@ class ModuleService
                         'name' => $lessonData['name'],
                         'slug' => Str::slug($lessonData['name']),
                         'description' => $lessonData['description'] ?? null,
+                        'duration' => $lessonData['duration'] ?? 0,
                     ]);
                 }
             }

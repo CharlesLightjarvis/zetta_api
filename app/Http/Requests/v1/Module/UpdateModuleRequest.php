@@ -29,6 +29,7 @@ class UpdateModuleRequest extends FormRequest
             'new_lessons' => 'sometimes|nullable|array',
             'new_lessons.*.name' => 'required|string|max:255',
             'new_lessons.*.description' => 'nullable|string|max:1000',
+            'new_lessons.*.duration' => 'required|integer|min:0',
         ];
     }
 }
