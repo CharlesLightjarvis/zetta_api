@@ -50,13 +50,13 @@ jobs:
       # - name: Run PHPStan
       #   run: vendor/bin/phpstan analyse
 
-      # - name: Deploy using ssh
-      #   uses: appleboy/ssh-action@v1.1.0
-      #   with:
-      #     host: ${{ secrets.SSH_HOST }}
-      #     username: ${{ secrets.SSH_USERNAME }}
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     script: |
-      #       cd ${{ secrets.APP_PATH }}   # Assure-toi d'être dans le bon dossier
-      #       chmod +x build.sh            # ✅ Donne les droits d'exécution
-      #       ./build.sh               # Exécution du script
+      - name: Deploy using ssh
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.APP_PATH }}   # Assure-toi d'être dans le bon dossier
+            chmod +x build.sh            # ✅ Donne les droits d'exécution
+            ./build.sh               # Exécution du script
