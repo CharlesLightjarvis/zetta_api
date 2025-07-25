@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\v1\UserController;
 use App\Http\Controllers\v1\CategoryController;
 use App\Http\Controllers\v1\CourseSchedulesController;
+use App\Http\Controllers\ChapterController;
+use App\Http\Controllers\CertificationQuestionController;
+use App\Http\Controllers\ExamConfigurationController;
+use App\Http\Controllers\ExamGeneratorController;
 
 Route::prefix('admin')->group(function () {
     Route::get('roles', [RoleController::class, '__invoke']);
@@ -61,5 +65,30 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::get('certifications/{certificationId}/modules', [QuizController::class, 'getCertificationModules']);
+
+    // Routes pour la gestion des chapitres
+    Route::get('certifications/{certification}/chapters', [ChapterController::class, 'index']);
+    Route::post('certifications/{certification}/chapters', [ChapterController::class, 'store']);
+    Route::get('chapters/{chapter}', [ChapterController::class, 'show']);
+    Route::put('chapters/{chapter}', [ChapterController::class, 'update']);
+    Route::delete('chapters/{chapter}', [ChapterController::class, 'destroy']);
+
+    // Routes pour la gestion des questions de certification
+    Route::get('chapters/{chapter}/questions', [CertificationQuestionController::class, 'index']);
+    Route::post('chapters/{chapter}/questions', [CertificationQuestionController::class, 'store']);
+    Route::get('chapters/{chapter}/questions/{question}', [CertificationQuestionController::class, 'show']);
+    Route::put('chapters/{chapter}/questions/{question}', [CertificationQuestionController::class, 'update']);
+    Route::delete('chapters/{chapter}/questions/{question}', [CertificationQuestionController::class, 'destroy']);
+
+    // Routes pour la configuration d'examens
+    Route::get('certifications/{certification}/exam-configuration', [ExamConfigurationController::class, 'show']);
+    Route::put('certifications/{certification}/exam-configuration', [ExamConfigurationController::class, 'update']);
+
+    // Routes pour la génération et l'exécution d'examens
+    Route::get('certifications/{certification}/exam/generate', [ExamGeneratorController::class, 'generate']);
+    Route::post('certifications/{certification}/exam/start', [ExamGeneratorController::class, 'start']);
+    Route::post('exam-sessions/{session}/submit', [ExamGeneratorController::class, 'submit']);
+    Route::post('exam-sessions/{session}/save-answer', [ExamGeneratorController::class, 'saveAnswer']);
+    Route::get('exam-sessions/{session}/status', [ExamGeneratorController::class, 'status']);
 });
 

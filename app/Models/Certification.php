@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -14,10 +16,11 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @property \App\Models\Formation $formation
  * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\Question> $questions
  * @property \App\Models\QuizConfiguration|null $quizConfiguration
+ * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\Chapter> $chapters
  */
 class Certification extends Model
 {
-    use HasUuids;
+    use HasUuids, HasFactory;
 
     protected $fillable = [
         'name',
@@ -68,6 +71,11 @@ class Certification extends Model
     public function quizConfiguration(): MorphOne
     {
         return $this->morphOne(QuizConfiguration::class, 'configurable');
+    }
+
+    public function chapters(): HasMany
+    {
+        return $this->hasMany(Chapter::class)->orderBy('order');
     }
 
     // public function questions(): MorphMany

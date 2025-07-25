@@ -10,10 +10,11 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Permission\Traits\HasRoles;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, HasUuids, Notifiable, HasRoles;
+    use HasFactory, HasUuids, Notifiable, HasRoles, HasApiTokens;
 
     protected $fillable = [
         'fullName',

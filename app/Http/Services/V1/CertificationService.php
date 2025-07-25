@@ -15,7 +15,7 @@ class CertificationService
     public function getAllCertifications()
     {
         return CertificationResource::collection(
-            Certification::with('formations')->get()
+            Certification::with('formations', 'chapters')->get()
         );
     }
 

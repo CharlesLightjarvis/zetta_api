@@ -24,10 +24,11 @@ class DatabaseSeeder extends Seeder
             // CategorySeeder::class,    // 2. Crée les catégories
             // FormationSeeder::class,   // 3. Crée les formations
             // CertificationSeeder::class, // 4. Crée les certifications
-            // ModuleSeeder::class,      // 5. Crée les modules
-            // LessonSeeder::class,      // 6. Crée les leçons
-            // FormationSessionSeeder::class, // 7. Crée les sessions de formation
-            // QuizSeeder::class,        // 8. Crée les configurations et questions pour les quiz
+            // CertificationExamSeeder::class, // 5. Crée les chapitres, questions et configurations d'examen
+            // ModuleSeeder::class,      // 6. Crée les modules
+            // LessonSeeder::class,      // 7. Crée les leçons
+            // FormationSessionSeeder::class, // 8. Crée les sessions de formation
+            // QuizSeeder::class,        // 9. Crée les configurations et questions pour les quiz
         ]);
     }
 }

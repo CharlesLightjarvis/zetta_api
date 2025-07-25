@@ -53,6 +53,17 @@ class CertificationResource extends JsonResource
                     ];
                 });
             }),
+            "chapters" => $this->whenLoaded('chapters', function () {
+                return $this->chapters->map(function ($chapter) {
+                    return [
+                        'id' => $chapter->id,
+                        'name' => $chapter->name,
+                        'description' => $chapter->description,
+                        'order' => $chapter->order,
+                        'questions_count' => $chapter->questions_count
+                    ];
+                });
+            }),
             "prerequisites" => $this->prerequisites,
             "skills" => $this->skills,
             "best_for" => $this->best_for,
