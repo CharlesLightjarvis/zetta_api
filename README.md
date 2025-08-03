@@ -651,3 +651,346 @@ if (pm.response.code === 200) {
     }
 }
 ```
+
+## Roles and Permissions Management
+
+### Overview
+
+The system includes a comprehensive role-based access control (RBAC) system that allows administrators to manage roles and permissions. This system uses the Spatie Laravel Permission package for robust permission management.
+
+### API Endpoints
+
+#### Role Management
+
+**Base URL**: `http://localhost:8000/api/v1/admin`
+
+**Headers required**:
+```
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {your_token}
+```
+
+##### List all roles
+```http
+GET /roles
+```
+
+**Example Response**:
+```json
+{
+    "success": true,
+    "message": "Roles retrieved successfully",
+    "roles": [
+        {
+            "id": "uuid",
+            "name": "admin",
+            "guard_name": "web",
+            "description": "Administrator role with full access",
+            "permissions": [
+                {
+                    "id": "uuid",
+                    "name": "manage_users",
+                    "guard_name": "web"
+                }
+            ]
+        }
+    ]
+}
+```
+
+##### Create a new role
+```http
+POST /roles
+```
+
+**Request Body**:
+```json
+{
+    "name": "teacher",
+    "guard_name": "web",
+    "description": "Teacher role with limited access"
+}
+```
+
+##### Get a specific role
+```http
+GET /roles/{role_id}
+```
+
+##### Update a role
+```http
+PUT /roles/{role_id}
+```
+
+**Request Body**:
+```json
+{
+    "name": "senior_teacher",
+    "description": "Senior teacher with additional permissions"
+}
+```
+
+##### Delete a role
+```http
+DELETE /roles/{role_id}
+```
+
+#### Permission Management
+
+##### List all permissions
+```http
+GET /permissions
+```
+
+##### Create a new permission
+```http
+POST /permissions
+```
+
+**Request Body**:
+```json
+{
+    "name": "manage_courses",
+    "guard_name": "web",
+    "description": "Permission to manage courses"
+}
+```
+
+##### Get a specific permission
+```http
+GET /permissions/{permission_id}
+```
+
+##### Update a permission
+```http
+PUT /permissions/{permission_id}
+```
+
+##### Delete a permission
+```http
+DELETE /permissions/{permission_id}
+```
+
+#### Role-Permission Assignment
+
+##### Assign permissions to a role
+```http
+POST /roles/{role_id}/permissions/assign
+```
+
+**Request Body**:
+```json
+{
+    "permission_ids": ["permission-uuid-1", "permission-uuid-2"]
+}
+```
+
+**Example Response**:
+```json
+{
+    "success": true,
+    "message": "Permissions assigned successfully",
+    "role": {
+        "id": "role-uuid",
+        "name": "teacher",
+        "permissions": [
+            {
+                "id": "permission-uuid-1",
+                "name": "manage_courses"
+            },
+            {
+                "id": "permission-uuid-2",
+                "name": "view_students"
+            }
+        ]
+    }
+}
+```
+
+##### Revoke permissions from a role
+```http
+POST /roles/{role_id}/permissions/revoke
+```
+
+**Request Body**:
+```json
+{
+    "permission_ids": ["permission-uuid-1"]
+}
+```
+
+##### Sync permissions for a role (replace all existing permissions)
+```http
+POST /roles/{role_id}/permissions/sync
+```
+
+**Request Body**:
+```json
+{
+    "permission_ids": ["permission-uuid-2", "permission-uuid-3"]
+}
+```
+
+##### Get all permissions for a specific role
+```http
+GET /roles/{role_id}/permissions
+```
+
+**Example Response**:
+```json
+{
+    "success": true,
+    "message": "Role permissions retrieved successfully",
+    "permissions": [
+        {
+            "id": "permission-uuid-1",
+            "name": "manage_courses",
+            "guard_name": "web",
+            "description": "Permission to manage courses"
+        }
+    ]
+}
+```
+
+### Testing with Postman
+
+#### Complete Workflow Example
+
+1. **Create a role**:
+```http
+POST /roles
+{
+    "name": "content_manager",
+    "description": "Manages course content"
+}
+```
+
+2. **Create permissions**:
+```http
+POST /permissions
+{
+    "name": "create_courses",
+    "description": "Can create new courses"
+}
+
+POST /permissions
+{
+    "name": "edit_courses", 
+    "description": "Can edit existing courses"
+}
+```
+
+3. **Assign permissions to role**:
+```http
+POST /roles/{role_id}/permissions/assign
+{
+    "permission_ids": ["create_courses_id", "edit_courses_id"]
+}
+```
+
+4. **Verify role permissions**:
+```http
+GET /roles/{role_id}/permissions
+```
+
+### Validation Rules
+
+#### Role Creation/Update
+- `name`: Required, string, unique
+- `guard_name`: Optional, defaults to 'web'
+- `description`: Optional, string
+
+#### Permission Creation/Update
+- `name`: Required, string, unique
+- `guard_name`: Optional, defaults to 'web'
+- `description`: Optional, string
+
+#### Permission Assignment
+- `permission_ids`: Required, array
+- `permission_ids.*`: Must exist in permissions table
+
+### Error Responses
+
+#### Common Error Codes
+- **422**: Validation failed
+- **404**: Role or permission not found
+- **500**: Server error
+
+#### Example Error Response
+```json
+{
+    "success": false,
+    "message": "Role not found"
+}
+```
+
+#### Validation Error Response
+```json
+{
+    "message": "The given data was invalid.",
+    "errors": {
+        "permission_ids.0": [
+            "The selected permission_ids.0 is invalid."
+        ]
+    }
+}
+```
+
+### Postman Collection Variables
+
+For easier testing, set up these environment variables:
+
+- `base_url`: `http://localhost:8000/api/v1/admin`
+- `token`: Your authentication token
+- `role_id`: ID of the role being tested
+- `permission_id`: ID of the permission being tested
+
+### Automated Test Scripts
+
+Add these scripts to your Postman requests for automated testing:
+
+```javascript
+// Extract role ID after creating a role
+if (pm.response.code === 201) {
+    const response = pm.response.json();
+    if (response.role && response.role.id) {
+        pm.environment.set("role_id", response.role.id);
+    }
+}
+
+// Extract permission ID after creating a permission
+if (pm.response.code === 201) {
+    const response = pm.response.json();
+    if (response.permission && response.permission.id) {
+        pm.environment.set("permission_id", response.permission.id);
+    }
+}
+
+// Verify successful permission assignment
+pm.test("Permissions assigned successfully", function () {
+    pm.expect(pm.response.code).to.equal(200);
+    const response = pm.response.json();
+    pm.expect(response.success).to.be.true;
+    pm.expect(response.role.permissions).to.be.an('array');
+});
+```
+
+### Security Features
+
+- **Database Transactions**: All role-permission operations are wrapped in database transactions
+- **Validation**: Comprehensive input validation for all endpoints
+- **Error Handling**: Proper error handling with meaningful messages
+- **Permission Caching**: Automatic cache management for optimal performance
+- **Immediate Updates**: Permission changes are immediately reflected for users with those roles
+
+### Integration with Existing System
+
+The role and permission system is designed to integrate seamlessly with the existing application:
+
+- Uses the same authentication system
+- Follows the same API response patterns
+- Maintains consistency with existing validation patterns
+- Includes comprehensive test coverage
+
+This RBAC system provides a solid foundation for managing user access control throughout the application while maintaining security and performance standards.

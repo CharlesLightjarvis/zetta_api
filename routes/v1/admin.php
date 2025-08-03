@@ -10,6 +10,7 @@ use App\Http\Controllers\v1\LessonController;
 use App\Http\Controllers\v1\ModuleController;
 use App\Http\Controllers\v1\PaymentController;
 use App\Http\Controllers\v1\RoleController;
+use App\Http\Controllers\v1\PermissionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\v1\UserController;
 use App\Http\Controllers\v1\CategoryController;
@@ -20,7 +21,14 @@ use App\Http\Controllers\ExamConfigurationController;
 use App\Http\Controllers\ExamGeneratorController;
 
 Route::prefix('admin')->group(function () {
-    Route::get('roles', [RoleController::class, '__invoke']);
+    Route::apiResource('roles', RoleController::class);
+    Route::apiResource('permissions', PermissionController::class);
+    
+    // Role-Permission assignment routes
+    Route::post('roles/{role}/permissions/assign', [RoleController::class, 'assignPermissions']);
+    Route::post('roles/{role}/permissions/revoke', [RoleController::class, 'revokePermissions']);
+    Route::post('roles/{role}/permissions/sync', [RoleController::class, 'syncPermissions']);
+    Route::get('roles/{role}/permissions', [RoleController::class, 'getPermissions']);
     Route::apiResource('users', UserController::class);
     Route::apiResource('lessons', LessonController::class);
     Route::apiResource('modules', ModuleController::class);
