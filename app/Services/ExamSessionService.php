@@ -33,12 +33,15 @@ class ExamSessionService
         $quizConfig = $certification->quizConfiguration;
         $timeLimit = $quizConfig->time_limit ?? 60; // Default 60 minutes
 
+        // Force UTC timezone pour éviter les problèmes entre local et production
+        $startTime = \Carbon\Carbon::now('UTC');
+        
         $session = ExamSession::create([
             'user_id' => $user->id,
             'certification_id' => $certification->id,
             'exam_data' => $examData,
-            'started_at' => now(),
-            'expires_at' => now()->addMinutes($timeLimit),
+            'started_at' => $startTime,
+            'expires_at' => $startTime->copy()->addMinutes($timeLimit),
             'status' => 'active'
         ]);
 
