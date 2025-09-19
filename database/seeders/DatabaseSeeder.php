@@ -19,8 +19,8 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            // RoleAndPermissionSeeder::class,
-            // UserSeeder::class,        // 1. Crée les utilisateurs (admin, teachers, students)
+            RoleAndPermissionSeeder::class,
+            UserSeeder::class,        // 1. Crée les utilisateurs (admin, teachers, students)
             CategorySeeder::class,    // 2. Crée les catégories
             FormationSeeder::class,   // 3. Crée les formations
             CertificationSeeder::class, // 4. Crée les certifications
