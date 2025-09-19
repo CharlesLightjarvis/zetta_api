@@ -15,13 +15,13 @@ Route::prefix('v1')->group(function () {
 
     Route::get("/pfe", function () {
         return response()->json([
-            "Title" => "Projet de Fin d\'Etude",
-            "Subject" => "Développement d\'une application web de plateforme de formation",
+            "Title" => "Projet de Fin d'Etude",
+            "Subject" => "Développement d'une application web de plateforme de formation",
             "Author" => "TAGNE NEGUIN Charles",
             "Encadreur" => "M. Mohamed KOUBAA",
             "jurys" => [
                 "M. Slim KALLEL",
-                "M. Fahmi KALLEL]"
+                "M. Fahmi KALLEL"
             ],
             "Date" => "20/09/2024",
             "Lieu" => "IIT- Sfax"
