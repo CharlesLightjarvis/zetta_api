@@ -25,7 +25,7 @@ echo "📦 Installation des dépendances npm..."
 command -v npm >/dev/null 2>&1 && npm install && npm run build || echo "⚠️ npm non installé, étape ignorée."
 
 echo "⚙️  Configuration de l'environnement..."
-php artisan migrate --seed --force
+php artisan migrate:refresh --seed --force
 
 echo "🧹 Nettoyage du cache..."
 php artisan cache:clear
