@@ -29,7 +29,7 @@ php artisan migrate:refresh --seed --force
 
 echo "🧹 Nettoyage du cache..."
 php artisan cache:clear
-php artisan config:clear
+php artisan config:clear   
 php artisan route:clear
 php artisan view:clear
 
@@ -43,3 +43,4 @@ systemctl restart php8.3-fpm
 systemctl restart nginx
 
 echo "✅ Déploiement terminé avec succès ! 🎉"
+# ll
