@@ -12,6 +12,21 @@ Route::prefix('v1')->group(function () {
     require __DIR__ . '/v1/admin.php';
     require __DIR__ . '/v1/teacher.php';
     require __DIR__ . '/v1/auth.php';
+
+    Route::get("/pfe", function () {
+        return response()->json([
+            "Title" => "Projet de Fin d\'Etude",
+            "Subject" => "Développement d\'une application web de plateforme de formation",
+            "Author" => "TAGNE NEGUIN Charles",
+            "Encadreur" => "M. Mohamed KOUBAA",
+            "jurys" => [
+                "M. Slim KALLEL",
+                "M. Fahmi KALLEL]"
+            ],
+            "Date" => "20/09/2024",
+            "Lieu" => "IIT- Sfax"
+        ]);
+    } );
     
     Route::get('/schedules/date-range', [CourseSchedulesController::class, 'getDateRangeSchedules']);
     Route::get('/schedules/week', [CourseSchedulesController::class, 'getWeekSchedules']);
